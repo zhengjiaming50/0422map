@@ -2,7 +2,10 @@
   <div class="map-view">
     <header class="map-header">
       <h1>武汉美食地图</h1>
-      <router-link to="/" class="home-link">返回首页</router-link>
+      <div class="nav-links">
+        <router-link to="/" class="home-link">返回首页</router-link>
+        <router-link to="/stats" class="stats-link">查看统计</router-link>
+      </div>
     </header>
     
     <div class="map-content">
@@ -139,10 +142,29 @@ onMounted(async () => {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   transition: background-color 0.3s;
+  margin-left: 0.5rem;
 }
 
 .home-link:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.stats-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-left: 0.5rem;
+}
+
+.stats-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-links {
+  display: flex;
 }
 
 .map-content {

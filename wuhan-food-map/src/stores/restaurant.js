@@ -220,6 +220,36 @@ export const useRestaurantStore = defineStore('restaurant', {
       if (this.heatmap.active && !this.heatmap.data) {
         this.fetchHeatmapData()
       }
+    },
+    
+    // 获取按区域统计的餐厅数量
+    async fetchStatsByDistrict() {
+      try {
+        return await restaurantApi.getStatsByDistrict()
+      } catch (error) {
+        console.error('获取区域统计数据失败:', error)
+        return []
+      }
+    },
+    
+    // 获取按美食类型统计的餐厅数量
+    async fetchStatsByFoodType() {
+      try {
+        return await restaurantApi.getStatsByFoodType()
+      } catch (error) {
+        console.error('获取美食类型统计数据失败:', error)
+        return []
+      }
+    },
+    
+    // 获取按区域和美食类型交叉统计的餐厅数量
+    async fetchStatsByDistrictFoodType(foodType = '') {
+      try {
+        return await restaurantApi.getStatsByDistrictFoodType(foodType)
+      } catch (error) {
+        console.error('获取区域美食类型交叉统计数据失败:', error)
+        return { categories: [], series: [] }
+      }
     }
   }
 }) 

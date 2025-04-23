@@ -155,6 +155,62 @@ export const restaurantApi = {
       console.error('获取热力图数据失败:', error)
       throw error
     }
+  },
+  
+  // 获取按区域统计的餐厅数量
+  async getStatsByDistrict() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurants/stats/by-district`)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('获取区域统计数据失败:', error)
+      throw error
+    }
+  },
+  
+  // 获取按美食类型统计的餐厅数量
+  async getStatsByFoodType() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurants/stats/by-food-type`)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('获取美食类型统计数据失败:', error)
+      throw error
+    }
+  },
+  
+  // 获取按区域和美食类型交叉统计的餐厅数量
+  async getStatsByDistrictFoodType(foodType = '') {
+    try {
+      let url = `${API_BASE_URL}/restaurants/stats/by-district-food-type`
+      
+      // 如果提供了特定美食类型，则添加到查询参数
+      if (foodType) {
+        const queryParams = new URLSearchParams({ food_type: foodType })
+        url = `${url}?${queryParams.toString()}`
+      }
+      
+      const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('获取区域美食类型交叉统计数据失败:', error)
+      throw error
+    }
   }
 } 
 

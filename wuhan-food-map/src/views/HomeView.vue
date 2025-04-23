@@ -11,6 +11,7 @@
         <p>这里汇集了武汉各区域的特色餐厅和美食，点击下方按钮开始你的美食探索之旅。</p>
         <div class="actions">
           <router-link to="/map" class="map-btn">进入地图</router-link>
+          <router-link to="/stats" class="stats-btn">查看统计</router-link>
         </div>
       </div>
     </main>
@@ -73,9 +74,26 @@ h1 {
   text-decoration: none;
   font-weight: bold;
   transition: background-color 0.3s;
+  margin: 0 0.5rem;
 }
 
 .map-btn:hover {
   background-color: #b71c1c;
+}
+
+.stats-btn {
+  display: inline-block;
+  background-color: #1976d2;
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  margin: 0 0.5rem;
+}
+
+.stats-btn:hover {
+  background-color: #0d47a1;
 }
 </style> 

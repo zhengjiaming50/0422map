@@ -15,6 +15,12 @@ const routes = [
     name: 'map',
     // 懒加载地图视图，提高首页加载性能
     component: () => import('../views/MapView.vue')
+  },
+  {
+    path: '/stats',
+    name: 'stats',
+    // 懒加载统计视图
+    component: () => import('../views/StatsView.vue')
   }
 ]
 

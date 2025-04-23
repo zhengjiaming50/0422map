@@ -268,4 +268,69 @@ def get_heatmap_data():
         "features": features
     }
     
-    return jsonify(geojson) 
+    return jsonify(geojson)
+
+@restaurant_bp.route('/restaurants/stats/by-district-food-type', methods=['GET'])
+def get_stats_by_district_food_type():
+    """获取按区域和美食类型交叉统计的餐厅数量"""
+    # 获取查询参数（可选的美食类型筛选）
+    food_type = request.args.get('food_type', '')
+    
+    # 创建基础查询
+    query = db.session.query(
+        Restaurant.district,
+        Restaurant.food_type,
+        func.count(Restaurant.id).label('count')
+    ).filter(
+        Restaurant.district != None,
+        Restaurant.food_type != None
+    )
+    
+    # 如果提供了特定美食类型，则进行筛选
+    if food_type:
+        query = query.filter(Restaurant.food_type == food_type)
+    
+    # 按区域和美食类型分组
+    stats = query.group_by(Restaurant.district, Restaurant.food_type).all()
+    
+    # 转换为适合图表显示的格式
+    result = {}
+    for stat in stats:
+        district = stat[0]
+        food_type = stat[1]
+        count = stat[2]
+        
+        if district not in result:
+            result[district] = {}
+        
+        result[district][food_type] = count
+    
+    # 构建最终数据结构
+    districts = list(result.keys())
+    food_types = set()
+    for district_data in result.values():
+        food_types.update(district_data.keys())
+    
+    food_types = list(food_types)
+    
+    # 构建数据系列
+    series = []
+    for food_type in food_types:
+        data = []
+        for district in districts:
+            # 获取该区域该美食类型的餐厅数量
+            count = result.get(district, {}).get(food_type, 0)
+            data.append(count)
+        
+        series.append({
+            "name": food_type,
+            "data": data
+        })
+    
+    # 最终返回结构
+    chart_data = {
+        "categories": districts,
+        "series": series
+    }
+    
+    return jsonify(chart_data) 
