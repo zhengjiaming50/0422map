@@ -139,6 +139,9 @@ const travelMode = ref('walking')
 const isPickingLocation = ref(false)
 const pickingFor = ref(null) // 'start' or 'end'
 
+// 用于存储自定义位置坐标的映射
+const customLocations = ref({})
+
 // 路线信息
 const route = ref(null)
 const error = ref(null)
@@ -175,6 +178,11 @@ const setPickedLocation = (pointType, locationId) => {
   } else if (pointType === 'end') {
     endPoint.value = locationId
   }
+}
+
+// 存储自定义位置坐标
+const setCustomLocationCoordinates = (locationId, coordinates) => {
+  customLocations.value[locationId] = coordinates
 }
 
 // 规划路线
@@ -220,6 +228,26 @@ const getLocationCoordinates = async (locationId) => {
     return props.userLocation ? 
       { lng: props.userLocation.lng, lat: props.userLocation.lat } : 
       null
+  }
+  
+  // 处理自定义位置（在地图上选择的位置）
+  if (locationId.startsWith('custom_')) {
+    // 如果在customLocations中有该位置的坐标，则使用它
+    if (customLocations.value[locationId]) {
+      return customLocations.value[locationId]
+    }
+    
+    // 尝试从DOM中获取标记位置
+    const marker = document.querySelector(`.custom-location-marker[data-id="${locationId}"]`)
+    if (marker && marker.dataset.lat && marker.dataset.lng) {
+      return { 
+        lng: parseFloat(marker.dataset.lng), 
+        lat: parseFloat(marker.dataset.lat)
+      }
+    }
+    
+    console.error('无法获取自定义位置坐标:', locationId)
+    return null
   }
   
   // 如果是餐厅
@@ -273,6 +301,7 @@ const getStepIcon = (maneuver) => {
 // 对外暴露方法
 defineExpose({
   setPickedLocation,
+  setCustomLocationCoordinates,
   clearRoute
 })
 </script>

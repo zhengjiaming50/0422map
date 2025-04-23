@@ -732,13 +732,20 @@ const handleMapClick = (e) => {
     // 创建一个自定义标记作为选择的位置
     const locationId = `custom_${locationPickingType.value}_${Date.now()}`
     
+    // 添加临时标记
+    addCustomLocationMarker(locationId, coords, locationPickingType.value)
+    
     // 通知路线面板
     if (routePanel.value) {
+      // 设置选择的位置ID
       routePanel.value.setPickedLocation(locationPickingType.value, locationId)
+      
+      // 确保位置坐标被正确传递
+      routePanel.value.setCustomLocationCoordinates(locationId, {
+        lng: coords.lng,
+        lat: coords.lat
+      })
     }
-    
-    // 在地图上添加临时标记
-    addCustomLocationMarker(locationId, coords, locationPickingType.value)
     
     // 退出选择模式
     stopLocationPicking()
@@ -764,6 +771,11 @@ const addCustomLocationMarker = (id, coords, type) => {
   el.className = 'custom-location-marker'
   el.textContent = type === 'start' ? '🚩' : '🏁'
   
+  // 添加自定义数据属性，以便稍后查询
+  el.dataset.id = id
+  el.dataset.lat = coords.lat
+  el.dataset.lng = coords.lng
+  
   // 创建标记
   const marker = new mapboxgl.Marker({
     element: el,
@@ -781,6 +793,14 @@ const addCustomLocationMarker = (id, coords, type) => {
       lng: coords.lng,
       lat: coords.lat
     }
+  }
+  
+  // 将自定义位置坐标传递给路线规划面板
+  if (routePanel.value && (type === 'start' || type === 'end')) {
+    routePanel.value.setCustomLocationCoordinates(id, {
+      lng: coords.lng,
+      lat: coords.lat
+    })
   }
 }
 
