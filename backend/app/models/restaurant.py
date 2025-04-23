@@ -1,6 +1,7 @@
 from datetime import datetime
 from geoalchemy2 import Geometry
 from app import db
+from sqlalchemy.orm import relationship
 
 class Restaurant(db.Model):
     """餐厅数据模型"""
@@ -21,6 +22,9 @@ class Restaurant(db.Model):
     district = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关联到评价
+    reviews = relationship("Review", back_populates="restaurant", cascade="all, delete-orphan")
     
     def __init__(self, name, address, latitude, longitude, food_type=None, 
                  district=None, phone=None, description=None, image_url=None, 

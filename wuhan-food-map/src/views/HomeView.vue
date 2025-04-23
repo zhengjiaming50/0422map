@@ -12,6 +12,8 @@
         <div class="actions">
           <router-link to="/map" class="map-btn">进入地图</router-link>
           <router-link to="/stats" class="stats-btn">查看统计</router-link>
+          <router-link to="/food-culture" class="culture-btn">美食文化</router-link>
+          <router-link to="/food-routes" class="routes-btn">美食路线</router-link>
         </div>
       </div>
     </main>
@@ -63,18 +65,24 @@ h1 {
 
 .actions {
   margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.map-btn {
+.map-btn, .stats-btn, .culture-btn, .routes-btn {
   display: inline-block;
-  background-color: #d32f2f;
   color: white;
   padding: 0.8rem 2rem;
   border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
   transition: background-color 0.3s;
-  margin: 0 0.5rem;
+}
+
+.map-btn {
+  background-color: #d32f2f;
 }
 
 .map-btn:hover {
@@ -82,18 +90,26 @@ h1 {
 }
 
 .stats-btn {
-  display: inline-block;
   background-color: #1976d2;
-  color: white;
-  padding: 0.8rem 2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s;
-  margin: 0 0.5rem;
 }
 
 .stats-btn:hover {
   background-color: #0d47a1;
+}
+
+.culture-btn {
+  background-color: #689f38;
+}
+
+.culture-btn:hover {
+  background-color: #558b2f;
+}
+
+.routes-btn {
+  background-color: #ff9800;
+}
+
+.routes-btn:hover {
+  background-color: #ef6c00;
 }
 </style> 

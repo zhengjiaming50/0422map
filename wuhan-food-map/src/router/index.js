@@ -21,6 +21,18 @@ const routes = [
     name: 'stats',
     // 懒加载统计视图
     component: () => import('../views/StatsView.vue')
+  },
+  {
+    path: '/food-culture',
+    name: 'foodCulture',
+    // 懒加载美食文化视图
+    component: () => import('../views/FoodCultureView.vue')
+  },
+  {
+    path: '/food-routes',
+    name: 'foodRoutes',
+    // 懒加载美食路线视图
+    component: () => import('../views/FoodRouteView.vue')
   }
 ]
 

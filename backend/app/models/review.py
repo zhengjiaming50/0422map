@@ -13,7 +13,7 @@ class Review(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # 与餐厅的关系
-    restaurant = db.relationship('Restaurant', backref=db.backref('reviews', cascade='all, delete-orphan'))
+    restaurant = db.relationship('Restaurant')
     
     def __init__(self, restaurant_id, rating, comment=None, user_name=None):
         self.restaurant_id = restaurant_id

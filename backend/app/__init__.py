@@ -20,9 +20,11 @@ def create_app(config_class=Config):
     # 注册蓝图
     from app.routes.restaurants import restaurant_bp
     from app.routes.routes import routes_bp
+    from app.routes.food_culture import food_culture_bp
     
     app.register_blueprint(restaurant_bp, url_prefix='/api')
     app.register_blueprint(routes_bp, url_prefix='/api/routes')
+    app.register_blueprint(food_culture_bp)
     
     @app.route('/api/health')
     def health_check():
