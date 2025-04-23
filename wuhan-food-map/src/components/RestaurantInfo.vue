@@ -10,11 +10,6 @@
     </div>
     
     <div class="info-content">
-      <div v-if="reviewData" class="rating-summary">
-        <RatingStars :model-value="reviewData.avg_rating" />
-        <span class="rating-text">{{ reviewData.avg_rating.toFixed(1) }} ({{ reviewData.review_count }})</span>
-      </div>
-      
       <div class="info-item">
         <div class="item-label">类型:</div>
         <div class="item-value">{{ restaurant.food_type || '未知' }}</div>
@@ -51,40 +46,10 @@
         <span>导航到这里</span>
       </button>
     </div>
-    
-    <!-- 用户评价区域 -->
-    <div class="info-reviews">
-      <div class="section-heading">
-        <h4>用户评价</h4>
-        <button v-if="!showReviewForm" class="add-review-btn" @click="showReviewForm = true">
-          写评价
-        </button>
-      </div>
-      
-      <ReviewForm 
-        v-if="showReviewForm" 
-        :restaurant-id="restaurant.id" 
-        :on-success="handleReviewSubmit"
-      />
-      
-      <ReviewList 
-        :reviews="reviews" 
-        :avg-rating="reviewData?.avg_rating || 0" 
-        :review-count="reviewData?.review_count || 0"
-        :loading="isLoading" 
-        :error="error"
-      />
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { restaurantApi } from '../services/api';
-import RatingStars from './RatingStars.vue';
-import ReviewList from './ReviewList.vue';
-import ReviewForm from './ReviewForm.vue';
-
 const props = defineProps({
   restaurant: {
     type: Object,
@@ -94,58 +59,11 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-// 评价数据
-const reviews = ref([]);
-const reviewData = ref(null);
-const isLoading = ref(false);
-const error = ref('');
-const showReviewForm = ref(false);
-
-// 获取评价数据
-const fetchReviews = async () => {
-  if (!props.restaurant || !props.restaurant.id) return;
-  
-  isLoading.value = true;
-  error.value = '';
-  
-  try {
-    const data = await restaurantApi.getRestaurantReviews(props.restaurant.id);
-    reviews.value = data.reviews;
-    reviewData.value = {
-      avg_rating: data.avg_rating,
-      review_count: data.review_count
-    };
-  } catch (err) {
-    console.error('获取评价失败:', err);
-    error.value = '无法加载评价数据';
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// 提交评价
-const handleReviewSubmit = async (reviewData) => {
-  if (!props.restaurant || !props.restaurant.id) return;
-  
-  // 提交评价
-  await restaurantApi.addRestaurantReview(props.restaurant.id, reviewData);
-  
-  // 重新获取评价列表
-  await fetchReviews();
-  
-  // 隐藏评价表单
-  showReviewForm.value = false;
-};
-
-// 导航功能
 const navigateTo = () => {
   // 以后实现导航功能
   console.log('导航到:', props.restaurant.name);
   // 可以使用百度地图、高德地图等第三方导航服务
 };
-
-// 组件加载时获取评价
-onMounted(fetchReviews);
 </script>
 
 <style scoped>
@@ -204,20 +122,6 @@ onMounted(fetchReviews);
   padding: 15px;
 }
 
-.rating-summary {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.rating-text {
-  margin-left: 8px;
-  color: #666;
-  font-size: 0.9rem;
-}
-
 .info-item {
   display: flex;
   margin-bottom: 10px;
@@ -273,37 +177,5 @@ onMounted(fetchReviews);
 
 .action-btn:hover {
   background-color: #c1121f;
-}
-
-.info-reviews {
-  padding: 15px;
-  border-top: 1px solid #eee;
-}
-
-.section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.section-heading h4 {
-  margin: 0;
-  color: #333;
-}
-
-.add-review-btn {
-  background-color: #1d3557;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
-}
-
-.add-review-btn:hover {
-  background-color: #14253d;
 }
 </style> 
