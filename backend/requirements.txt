@@ -1,0 +1,7 @@
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-CORS==5.0.0
+SQLAlchemy==2.0.27
+GeoAlchemy2==0.14.2
+psycopg2-binary==2.9.9
+python-dotenv==1.0.0 
