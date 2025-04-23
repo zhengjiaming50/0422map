@@ -5,6 +5,7 @@
       <div class="nav-links">
         <router-link to="/" class="home-link">返回首页</router-link>
         <router-link to="/stats" class="stats-link">查看统计</router-link>
+        <router-link to="/food-culture" class="culture-link">美食文化</router-link>
       </div>
     </header>
     
@@ -160,6 +161,20 @@ onMounted(async () => {
 }
 
 .stats-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.culture-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-left: 0.5rem;
+}
+
+.culture-link:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
