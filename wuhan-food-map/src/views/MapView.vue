@@ -7,11 +7,8 @@
     
     <div class="map-content">
       <div class="filter-panel-container">
-        <!-- 筛选面板将在下一步实现 -->
-        <div class="filter-placeholder">
-          <h3>筛选面板</h3>
-          <p>将在下一步实现筛选和搜索功能</p>
-        </div>
+        <!-- 替换占位符为实际的FilterPanel组件 -->
+        <FilterPanel />
         
         <div v-if="restaurantStore.loading" class="loading-indicator">
           <span>加载中...</span>
@@ -52,8 +49,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import MapContainer from '../components/MapContainer.vue'
+import FilterPanel from '../components/FilterPanel.vue'
 import { useRestaurantStore } from '../stores/restaurant'
 
 // 餐厅状态管理
@@ -93,8 +91,18 @@ const selectRestaurant = (restaurant) => {
   }
 }
 
+// 监听store中selectedRestaurant的变化
+watch(() => restaurantStore.selectedRestaurant, (newSelectedRestaurant) => {
+  if (newSelectedRestaurant) {
+    selectedRestaurantId.value = newSelectedRestaurant.id
+  } else {
+    selectedRestaurantId.value = null
+  }
+})
+
 onMounted(async () => {
-  // 可以在此处初始化数据，但现在已经在MapContainer中处理
+  // 初始化获取餐厅数据
+  await restaurantStore.fetchRestaurants()
 })
 </script>
 

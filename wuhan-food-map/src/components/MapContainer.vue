@@ -5,6 +5,12 @@
       <button @click="zoomIn" class="control-btn" title="放大">+</button>
       <button @click="zoomOut" class="control-btn" title="缩小">-</button>
       <button @click="resetView" class="control-btn" title="重置视图">⟳</button>
+      <button 
+        @click="toggleBoxSelection" 
+        class="control-btn" 
+        :class="{ 'active': boxSelectionMode }" 
+        title="框选区域"
+      >◰</button>
     </div>
     <div v-if="selectedRestaurant" class="restaurant-detail-panel">
       <RestaurantInfo 
@@ -12,8 +18,18 @@
         @close="closeRestaurantInfo" 
       />
     </div>
+    <div class="box-selection-panel">
+      <BoxSelectionList 
+        @close="closeBoxSelection"
+        @select-restaurant="handleMarkerClick"
+      />
+    </div>
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
+    </div>
+    <!-- 框选操作提示 -->
+    <div v-if="boxSelectionMode" class="box-selection-hint">
+      请在地图上拖动鼠标框选区域
     </div>
   </div>
 </template>
@@ -24,6 +40,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRestaurantStore } from '../stores/restaurant'
 import RestaurantInfo from './RestaurantInfo.vue'
+import BoxSelectionList from './BoxSelectionList.vue'
 
 // 定义props
 const props = defineProps({
@@ -70,6 +87,15 @@ const selectedRestaurant = ref(null)
 // 加载状态
 const loading = ref(false)
 
+// 框选模式状态
+const boxSelectionMode = ref(false)
+
+// 框选起始点
+const boxStart = ref(null)
+
+// 框选矩形实例
+const boxElement = ref(null)
+
 // 初始化地图
 const initMap = () => {
   // 设置Token（真实项目中应从环境变量获取）
@@ -102,6 +128,8 @@ const initMap = () => {
       console.log('地图加载完成')
       emit('map-loaded', mapInstance.value)
       fetchRestaurants()
+      // 初始化框选相关事件
+      initBoxSelectionEvents()
     })
     
     mapInstance.value.on('click', (e) => {
@@ -116,6 +144,218 @@ const initMap = () => {
   } catch (error) {
     console.error('地图初始化失败:', error)
   }
+}
+
+// 初始化框选事件
+const initBoxSelectionEvents = () => {
+  if (!mapInstance.value) return
+  
+  // 鼠标按下事件
+  mapInstance.value.on('mousedown', (e) => {
+    if (!boxSelectionMode.value) return
+    
+    // 阻止默认行为和事件冒泡
+    e.preventDefault()
+    
+    // 记录起始点
+    boxStart.value = e.point
+    
+    // 创建框选矩形
+    createBoxElement()
+    
+    // 添加鼠标移动和松开事件
+    mapInstance.value.on('mousemove', onMouseMove)
+    mapInstance.value.once('mouseup', onMouseUp)
+  })
+}
+
+// 创建框选矩形元素
+const createBoxElement = () => {
+  // 移除可能存在的旧元素
+  if (boxElement.value) {
+    boxElement.value.remove()
+  }
+  
+  // 创建新元素
+  boxElement.value = document.createElement('div')
+  boxElement.value.className = 'box-selection-rect'
+  mapElement.value.appendChild(boxElement.value)
+}
+
+// 鼠标移动时更新框选矩形
+const onMouseMove = (e) => {
+  if (!boxStart.value || !boxElement.value) return
+  
+  // 计算矩形坐标
+  const minX = Math.min(boxStart.value.x, e.point.x)
+  const maxX = Math.max(boxStart.value.x, e.point.x)
+  const minY = Math.min(boxStart.value.y, e.point.y)
+  const maxY = Math.max(boxStart.value.y, e.point.y)
+  
+  // 设置矩形样式
+  boxElement.value.style.left = `${minX}px`
+  boxElement.value.style.top = `${minY}px`
+  boxElement.value.style.width = `${maxX - minX}px`
+  boxElement.value.style.height = `${maxY - minY}px`
+}
+
+// 鼠标松开时完成框选
+const onMouseUp = (e) => {
+  if (!boxStart.value) return
+  
+  // 移除监听器
+  mapInstance.value.off('mousemove', onMouseMove)
+  
+  // 计算边界框地理坐标
+  const sw = mapInstance.value.unproject([
+    Math.min(boxStart.value.x, e.point.x),
+    Math.max(boxStart.value.y, e.point.y)
+  ])
+  
+  const ne = mapInstance.value.unproject([
+    Math.max(boxStart.value.x, e.point.x),
+    Math.min(boxStart.value.y, e.point.y)
+  ])
+  
+  // 查询边界框内的餐厅
+  fetchRestaurantsInBox({
+    minLng: sw.lng,
+    minLat: sw.lat,
+    maxLng: ne.lng,
+    maxLat: ne.lat
+  })
+  
+  // 重置框选状态
+  boxStart.value = null
+  
+  // 显示边界框
+  displayBoxBounds(sw, ne)
+}
+
+// 显示框选边界
+const displayBoxBounds = (sw, ne) => {
+  if (!mapInstance.value) return
+  
+  // 如果已有边界图层，先移除
+  if (mapInstance.value.getSource('box-bounds')) {
+    mapInstance.value.removeLayer('box-fill')
+    mapInstance.value.removeLayer('box-outline')
+    mapInstance.value.removeSource('box-bounds')
+  }
+  
+  // 添加边界数据源
+  mapInstance.value.addSource('box-bounds', {
+    'type': 'geojson',
+    'data': {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Polygon',
+        'coordinates': [[
+          [sw.lng, sw.lat],
+          [ne.lng, sw.lat],
+          [ne.lng, ne.lat],
+          [sw.lng, ne.lat],
+          [sw.lng, sw.lat]
+        ]]
+      }
+    }
+  })
+  
+  // 添加填充图层
+  mapInstance.value.addLayer({
+    'id': 'box-fill',
+    'type': 'fill',
+    'source': 'box-bounds',
+    'layout': {},
+    'paint': {
+      'fill-color': '#4369b2',
+      'fill-opacity': 0.15
+    }
+  })
+  
+  // 添加边框图层
+  mapInstance.value.addLayer({
+    'id': 'box-outline',
+    'type': 'line',
+    'source': 'box-bounds',
+    'layout': {},
+    'paint': {
+      'line-color': '#4369b2',
+      'line-width': 2
+    }
+  })
+  
+  // 移除临时矩形
+  if (boxElement.value) {
+    boxElement.value.remove()
+    boxElement.value = null
+  }
+}
+
+// 查询边界框内的餐厅
+const fetchRestaurantsInBox = async (bounds) => {
+  loading.value = true
+  
+  try {
+    await restaurantStore.fetchRestaurantsInBox(bounds)
+    
+    // 切换到框选模式
+    boxSelectionMode.value = true
+  } catch (error) {
+    console.error('获取边界框内餐厅失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 切换框选模式
+const toggleBoxSelection = () => {
+  // 切换框选模式
+  boxSelectionMode.value = !boxSelectionMode.value
+  
+  if (!boxSelectionMode.value) {
+    // 如果关闭框选模式，清除框选结果
+    clearBoxSelection()
+  } else {
+    // 激活框选模式，光标变为十字形
+    mapElement.value.style.cursor = 'crosshair'
+  }
+}
+
+// 清除框选
+const clearBoxSelection = () => {
+  if (!mapInstance.value) return
+  
+  // 重置光标
+  mapElement.value.style.cursor = ''
+  
+  // 移除边界显示
+  if (mapInstance.value.getSource('box-bounds')) {
+    mapInstance.value.removeLayer('box-fill')
+    mapInstance.value.removeLayer('box-outline')
+    mapInstance.value.removeSource('box-bounds')
+  }
+  
+  // 清除框选矩形
+  if (boxElement.value) {
+    boxElement.value.remove()
+    boxElement.value = null
+  }
+  
+  // 重置框选状态
+  boxStart.value = null
+  
+  // 清除状态管理里的框选结果
+  restaurantStore.clearBoxSelection()
+}
+
+// 关闭框选面板
+const closeBoxSelection = () => {
+  // 关闭框选模式
+  boxSelectionMode.value = false
+  
+  // 清除框选
+  clearBoxSelection()
 }
 
 // 获取餐厅数据
@@ -149,7 +389,22 @@ const addMarker = (restaurant) => {
   // 创建标记元素
   const markerElement = document.createElement('div')
   markerElement.className = 'restaurant-marker'
-  markerElement.innerHTML = '🍜'
+  
+  // 根据餐厅类型选择不同图标
+  let icon = '🍜';
+  if (restaurant.food_type) {
+    const foodType = restaurant.food_type.toLowerCase();
+    if (foodType.includes('火锅')) icon = '🍲';
+    else if (foodType.includes('烧烤')) icon = '🍢';
+    else if (foodType.includes('西餐')) icon = '🍔';
+    else if (foodType.includes('粤菜')) icon = '🥘';
+    else if (foodType.includes('小吃')) icon = '🥟';
+    else if (foodType.includes('甜点')) icon = '🍰';
+    else if (foodType.includes('咖啡')) icon = '☕';
+    else if (foodType.includes('茶')) icon = '🍵';
+  }
+  
+  markerElement.innerHTML = icon
   
   // 创建Mapbox标记
   const marker = new mapboxgl.Marker(markerElement)
@@ -175,12 +430,19 @@ const clearMarkers = () => {
 
 // 标记点击处理
 const handleMarkerClick = (restaurant) => {
+  // 更新选中的餐厅
   selectedRestaurant.value = restaurant
+  
+  // 获取餐厅详情
+  restaurantStore.setSelectedRestaurant(restaurant)
+  
+  // 高亮显示选中的标记
+  highlightSelectedMarker(restaurant.id)
   
   // 缩放到餐厅位置
   mapInstance.value.flyTo({
     center: [restaurant.longitude, restaurant.latitude],
-    zoom: 15,
+    zoom: 16, // 放大级别更高，能更清楚看到餐厅位置
     essential: true,
     duration: 1000
   })
@@ -188,14 +450,38 @@ const handleMarkerClick = (restaurant) => {
   emit('marker-click', restaurant)
 }
 
+// 高亮显示选中的标记
+const highlightSelectedMarker = (selectedId) => {
+  // 移除所有标记的高亮样式
+  Object.keys(markers.value).forEach(id => {
+    const marker = markers.value[id];
+    const element = marker.getElement();
+    element.classList.remove('selected');
+  });
+  
+  // 添加高亮样式到选中的标记
+  if (markers.value[selectedId]) {
+    const element = markers.value[selectedId].getElement();
+    element.classList.add('selected');
+  }
+}
+
 // 关闭餐厅详情
 const closeRestaurantInfo = () => {
   selectedRestaurant.value = null
+  restaurantStore.clearSelectedRestaurant()
+  
+  // 移除所有标记的高亮样式
+  Object.keys(markers.value).forEach(id => {
+    const marker = markers.value[id];
+    const element = marker.getElement();
+    element.classList.remove('selected');
+  });
 }
 
 // 暴露方法给父组件
 const getMapInstance = () => mapInstance.value
-defineExpose({ getMapInstance })
+defineExpose({ getMapInstance, handleMarkerClick })
 
 // 地图控制方法
 const zoomIn = () => {
@@ -221,6 +507,14 @@ const resetView = () => {
     
     // 关闭详情面板并清除选中状态
     selectedRestaurant.value = null
+    restaurantStore.clearSelectedRestaurant()
+    
+    // 移除所有标记的高亮样式
+    Object.keys(markers.value).forEach(id => {
+      const marker = markers.value[id];
+      const element = marker.getElement();
+      element.classList.remove('selected');
+    });
   }
 }
 
@@ -293,10 +587,21 @@ onUnmounted(() => {
   transform: scale(0.95);
 }
 
+.control-btn.active {
+  background-color: #e63946;
+}
+
 .restaurant-detail-panel {
   position: absolute;
   bottom: 20px;
   left: 20px;
+  z-index: 2;
+}
+
+.box-selection-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
   z-index: 2;
 }
 
@@ -344,5 +649,55 @@ onUnmounted(() => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* 餐厅标记样式 */
+:deep(.restaurant-marker) {
+  width: 30px;
+  height: 30px;
+  background-color: #e63946;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+:deep(.restaurant-marker:hover) {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+:deep(.restaurant-marker.selected) {
+  background-color: #457b9d;
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(69, 123, 157, 0.5), 0 3px 6px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+/* 框选矩形样式 */
+.box-selection-rect {
+  position: absolute;
+  background-color: rgba(67, 105, 178, 0.2);
+  border: 2px solid #4369b2;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.box-selection-hint {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 3;
 }
 </style> 

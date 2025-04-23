@@ -165,4 +165,44 @@ def get_restaurant_reviews(restaurant_id):
         "reviews": result,
         "avg_rating": round(avg_rating, 1),
         "total_reviews": len(reviews)
-    }) 
+    })
+
+@restaurant_bp.route('/restaurants/<int:restaurant_id>/reviews', methods=['POST'])
+def add_restaurant_review(restaurant_id):
+    """添加餐厅评价"""
+    # 确认餐厅存在
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    
+    try:
+        # 获取请求数据
+        data = request.json
+        
+        # 验证必要字段
+        if not data or 'rating' not in data:
+            return jsonify({"error": "评分为必填字段"}), 400
+        
+        # 验证评分范围
+        rating = int(data['rating'])
+        if rating < 1 or rating > 5:
+            return jsonify({"error": "评分必须在1到5之间"}), 400
+        
+        # 创建评价记录
+        review = Review(
+            restaurant_id=restaurant_id,
+            rating=rating,
+            comment=data.get('comment'),
+            user_name=data.get('user_name')
+        )
+        
+        # 保存到数据库
+        db.session.add(review)
+        db.session.commit()
+        
+        return jsonify({
+            "message": "评价添加成功",
+            "review": review.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400 

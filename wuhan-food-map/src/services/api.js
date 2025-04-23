@@ -77,6 +77,31 @@ export const restaurantApi = {
     }
   },
   
+  // 获取指定边界框内的餐厅列表
+  async getRestaurantsInBoundingBox(bounds) {
+    try {
+      const { minLng, minLat, maxLng, maxLat } = bounds
+      const queryParams = new URLSearchParams({
+        min_lng: minLng,
+        min_lat: minLat,
+        max_lng: maxLng,
+        max_lat: maxLat
+      })
+      
+      const url = `${API_BASE_URL}/restaurants/bbox?${queryParams.toString()}`
+      const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('获取边界框内餐厅失败:', error)
+      throw error
+    }
+  },
+  
   // 获取指定餐厅的评价列表
   async getRestaurantReviews(restaurantId) {
     try {
@@ -89,6 +114,29 @@ export const restaurantApi = {
       return await response.json()
     } catch (error) {
       console.error(`获取餐厅评价失败 (ID: ${restaurantId}):`, error)
+      throw error
+    }
+  },
+  
+  // 提交餐厅评价
+  async submitReview(restaurantId, reviewData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reviewData)
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error(`提交餐厅评价失败 (ID: ${restaurantId}):`, error)
       throw error
     }
   }

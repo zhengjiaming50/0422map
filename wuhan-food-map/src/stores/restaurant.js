@@ -15,7 +15,13 @@ export const useRestaurantStore = defineStore('restaurant', {
       searchQuery: ''
     },
     districtList: [],
-    foodTypeList: []
+    foodTypeList: [],
+    // 添加区域框选相关状态
+    boxSelection: {
+      active: false,
+      restaurants: [],
+      bounds: null
+    }
   }),
 
   // 计算属性
@@ -144,6 +150,39 @@ export const useRestaurantStore = defineStore('restaurant', {
     // 清除选中的餐厅
     clearSelectedRestaurant() {
       this.selectedRestaurant = null
+    },
+    
+    // 获取边界框内的餐厅
+    async fetchRestaurantsInBox(bounds) {
+      this.loading = true
+      this.error = null
+      
+      try {
+        // 保存当前边界框
+        this.boxSelection.bounds = bounds
+        
+        // 获取边界框内的餐厅
+        const boxRestaurants = await restaurantApi.getRestaurantsInBoundingBox(bounds)
+        
+        // 更新框选餐厅列表
+        this.boxSelection.restaurants = boxRestaurants
+        this.boxSelection.active = true
+        
+        return boxRestaurants
+      } catch (error) {
+        this.error = error.message || '获取区域内餐厅失败'
+        console.error('获取区域内餐厅失败:', error)
+        return []
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 清除框选
+    clearBoxSelection() {
+      this.boxSelection.active = false
+      this.boxSelection.restaurants = []
+      this.boxSelection.bounds = null
     }
   }
 }) 
