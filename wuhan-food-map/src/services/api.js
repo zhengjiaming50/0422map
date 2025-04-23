@@ -157,3 +157,33 @@ export const restaurantApi = {
     }
   }
 } 
+
+// 路线规划API服务
+export const routeApi = {
+  // 获取路线规划
+  async getRoute(routeParams) {
+    try {
+      const { start, end, mode } = routeParams
+      
+      const queryParams = new URLSearchParams({
+        start_lng: start.lng,
+        start_lat: start.lat,
+        end_lng: end.lng,
+        end_lat: end.lat,
+        mode: mode || 'walking'
+      })
+      
+      const url = `${API_BASE_URL}/routes/?${queryParams.toString()}`
+      const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('获取路线规划失败:', error)
+      throw error
+    }
+  }
+} 

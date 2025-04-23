@@ -18,7 +18,26 @@
         :class="{ 'active': heatmapMode }" 
         title="切换热力图"
       >🔥</button>
+      <!-- 路线规划按钮 -->
+      <button 
+        @click="toggleRoutePanel" 
+        class="control-btn" 
+        :class="{ 'active': routePanelActive }" 
+        title="路线规划"
+      >🗺️</button>
     </div>
+    
+    <!-- 路线规划面板 -->
+    <RoutePanel 
+      ref="routePanel"
+      :isActive="routePanelActive"
+      :userLocation="userLocation"
+      @close="closeRoutePanel"
+      @start-picking-mode="startLocationPicking"
+      @route-planned="drawRoute"
+      @route-cleared="clearRoute"
+    />
+    
     <div v-if="selectedRestaurant" class="restaurant-detail-panel">
       <RestaurantInfo 
         :restaurant="selectedRestaurant" 
@@ -38,6 +57,10 @@
     <div v-if="boxSelectionMode" class="box-selection-hint">
       请在地图上拖动鼠标框选区域
     </div>
+    <!-- 地点选择提示 -->
+    <div v-if="locationPickingMode" class="location-picking-hint">
+      请在地图上点击选择{{ locationPickingType === 'start' ? '起点' : '终点' }}位置
+    </div>
   </div>
 </template>
 
@@ -48,6 +71,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRestaurantStore } from '../stores/restaurant'
 import RestaurantInfo from './RestaurantInfo.vue'
 import BoxSelectionList from './BoxSelectionList.vue'
+import RoutePanel from './RoutePanel.vue'
 
 // 定义props
 const props = defineProps({
@@ -106,6 +130,15 @@ const boxElement = ref(null)
 // 热力图模式状态
 const heatmapMode = ref(false)
 
+// 路线规划相关状态
+const routePanelActive = ref(false)
+const routePanel = ref(null)
+const currentRoute = ref(null)
+const routeSource = ref(null)
+const locationPickingMode = ref(false)
+const locationPickingType = ref(null) // 'start' 或 'end'
+const userLocation = ref(null)
+
 // 初始化地图
 const initMap = () => {
   // 设置Token（真实项目中应从环境变量获取）
@@ -142,9 +175,12 @@ const initMap = () => {
       initBoxSelectionEvents()
       // 初始化热力图数据
       initHeatmapSource()
+      // 尝试获取用户位置
+      getUserLocation()
     })
     
     mapInstance.value.on('click', (e) => {
+      handleMapClick(e)
       emit('map-click', e)
     })
     
@@ -650,6 +686,229 @@ watch(() => restaurantStore.filteredRestaurants, () => {
   updateHeatmapData()
 }, { deep: true })
 
+// 切换路线规划面板
+const toggleRoutePanel = () => {
+  routePanelActive.value = !routePanelActive.value
+  
+  // 如果关闭面板，同时清除路线
+  if (!routePanelActive.value) {
+    clearRoute()
+  }
+}
+
+// 关闭路线规划面板
+const closeRoutePanel = () => {
+  routePanelActive.value = false
+}
+
+// 启动位置选择模式
+const startLocationPicking = (locationType) => {
+  locationPickingMode.value = true
+  locationPickingType.value = locationType
+  
+  // 如果地图已加载，更改鼠标样式
+  if (mapInstance.value) {
+    mapInstance.value.getCanvas().style.cursor = 'crosshair'
+  }
+}
+
+// 停止位置选择模式
+const stopLocationPicking = () => {
+  locationPickingMode.value = false
+  locationPickingType.value = null
+  
+  // 恢复鼠标样式
+  if (mapInstance.value) {
+    mapInstance.value.getCanvas().style.cursor = ''
+  }
+}
+
+// 处理地图点击事件
+const handleMapClick = (e) => {
+  // 如果在位置选择模式下
+  if (locationPickingMode.value) {
+    const coords = e.lngLat
+    
+    // 创建一个自定义标记作为选择的位置
+    const locationId = `custom_${locationPickingType.value}_${Date.now()}`
+    
+    // 通知路线面板
+    if (routePanel.value) {
+      routePanel.value.setPickedLocation(locationPickingType.value, locationId)
+    }
+    
+    // 在地图上添加临时标记
+    addCustomLocationMarker(locationId, coords, locationPickingType.value)
+    
+    // 退出选择模式
+    stopLocationPicking()
+    
+    return
+  }
+  
+  // 原有的点击处理逻辑...
+}
+
+// 添加自定义位置标记
+const addCustomLocationMarker = (id, coords, type) => {
+  // 如果已存在同类型的标记，先移除它
+  Object.keys(markers.value).forEach(markerId => {
+    if (markerId.startsWith(`custom_${type}_`)) {
+      markers.value[markerId].remove()
+      delete markers.value[markerId]
+    }
+  })
+  
+  // 创建新的DOM元素
+  const el = document.createElement('div')
+  el.className = 'custom-location-marker'
+  el.textContent = type === 'start' ? '🚩' : '🏁'
+  
+  // 创建标记
+  const marker = new mapboxgl.Marker({
+    element: el,
+    draggable: false
+  })
+  .setLngLat(coords)
+  .addTo(mapInstance.value)
+  
+  // 保存到标记集合
+  markers.value[id] = marker
+  
+  // 同时保存为用户位置
+  if (type === 'start') {
+    userLocation.value = {
+      lng: coords.lng,
+      lat: coords.lat
+    }
+  }
+}
+
+// 绘制路线
+const drawRoute = (routeData) => {
+  // 保存当前路线
+  currentRoute.value = routeData
+  
+  // 清除现有路线
+  clearRoute()
+  
+  // 如果没有地图实例或路线数据，则返回
+  if (!mapInstance.value || !routeData || !routeData.geometry) return
+  
+  // 检查路线源是否存在
+  if (!mapInstance.value.getSource('route')) {
+    // 添加路线源
+    mapInstance.value.addSource('route', {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: routeData.geometry
+      }
+    })
+    
+    // 添加路线图层
+    mapInstance.value.addLayer({
+      id: 'route',
+      type: 'line',
+      source: 'route',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      paint: {
+        'line-color': '#4CAF50',
+        'line-width': 6,
+        'line-opacity': 0.8
+      }
+    })
+  } else {
+    // 更新现有路线
+    mapInstance.value.getSource('route').setData({
+      type: 'Feature',
+      properties: {},
+      geometry: routeData.geometry
+    })
+  }
+  
+  // 添加起点和终点标记
+  if (routeData.geometry && routeData.geometry.coordinates.length > 0) {
+    const coordinates = routeData.geometry.coordinates
+    const startCoord = coordinates[0]
+    const endCoord = coordinates[coordinates.length - 1]
+    
+    // 添加起点和终点标记
+    addCustomLocationMarker('custom_start_point', { lng: startCoord[0], lat: startCoord[1] }, 'start')
+    addCustomLocationMarker('custom_end_point', { lng: endCoord[0], lat: endCoord[1] }, 'end')
+    
+    // 调整地图视图以适应路线
+    fitMapToRoute(routeData.geometry.coordinates)
+  }
+}
+
+// 清除路线
+const clearRoute = () => {
+  // 清除当前路线数据
+  currentRoute.value = null
+  
+  // 移除地图上的路线图层和源
+  if (mapInstance.value) {
+    if (mapInstance.value.getLayer('route')) {
+      mapInstance.value.removeLayer('route')
+    }
+    
+    if (mapInstance.value.getSource('route')) {
+      mapInstance.value.removeSource('route')
+    }
+    
+    // 移除标记
+    Object.keys(markers.value).forEach(markerId => {
+      if (markerId.startsWith('custom_')) {
+        markers.value[markerId].remove()
+        delete markers.value[markerId]
+      }
+    })
+  }
+}
+
+// 调整地图视图以适应路线
+const fitMapToRoute = (coordinates) => {
+  if (!mapInstance.value || !coordinates || coordinates.length === 0) return
+  
+  // 创建包含所有坐标的边界框
+  const bounds = coordinates.reduce((bounds, coord) => {
+    return bounds.extend(coord)
+  }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]))
+  
+  // 调整地图视图
+  mapInstance.value.fitBounds(bounds, {
+    padding: 50,
+    maxZoom: 15
+  })
+}
+
+// 获取用户位置
+const getUserLocation = () => {
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLocation.value = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        }
+        
+        // 可选：在地图上添加用户位置标记
+        if (mapInstance.value) {
+          addCustomLocationMarker('user_current_location', userLocation.value, 'user')
+        }
+      },
+      (error) => {
+        console.error('无法获取用户位置:', error)
+      }
+    )
+  }
+}
+
 // 生命周期钩子
 onMounted(() => {
   initMap()
@@ -826,5 +1085,24 @@ onUnmounted(() => {
   border-radius: 20px;
   font-size: 14px;
   z-index: 3;
+}
+
+/* 添加路线规划相关样式 */
+.custom-location-marker {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.location-picking-hint {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10;
 }
 </style> 
