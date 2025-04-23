@@ -11,6 +11,13 @@
         :class="{ 'active': boxSelectionMode }" 
         title="框选区域"
       >◰</button>
+      <!-- 热力图切换按钮 -->
+      <button 
+        @click="toggleHeatmap" 
+        class="control-btn" 
+        :class="{ 'active': heatmapMode }" 
+        title="切换热力图"
+      >🔥</button>
     </div>
     <div v-if="selectedRestaurant" class="restaurant-detail-panel">
       <RestaurantInfo 
@@ -96,6 +103,9 @@ const boxStart = ref(null)
 // 框选矩形实例
 const boxElement = ref(null)
 
+// 热力图模式状态
+const heatmapMode = ref(false)
+
 // 初始化地图
 const initMap = () => {
   // 设置Token（真实项目中应从环境变量获取）
@@ -130,6 +140,8 @@ const initMap = () => {
       fetchRestaurants()
       // 初始化框选相关事件
       initBoxSelectionEvents()
+      // 初始化热力图数据
+      initHeatmapSource()
     })
     
     mapInstance.value.on('click', (e) => {
@@ -364,6 +376,8 @@ const fetchRestaurants = async () => {
   try {
     await restaurantStore.fetchRestaurants()
     renderRestaurants()
+    // 更新热力图数据
+    updateHeatmapData()
   } catch (error) {
     console.error('获取餐厅数据失败:', error)
   } finally {
@@ -518,9 +532,122 @@ const resetView = () => {
   }
 }
 
-// 监听filteredRestaurants变化，重新渲染标记
+// 初始化热力图数据源
+const initHeatmapSource = () => {
+  if (!mapInstance.value) return
+  
+  // 添加热力图数据源
+  mapInstance.value.addSource('restaurants-heat', {
+    'type': 'geojson',
+    'data': {
+      'type': 'FeatureCollection',
+      'features': []
+    }
+  })
+  
+  // 添加热力图图层
+  mapInstance.value.addLayer({
+    'id': 'restaurants-heat-layer',
+    'type': 'heatmap',
+    'source': 'restaurants-heat',
+    'maxzoom': 18,
+    'paint': {
+      // 热力图颜色渐变
+      'heatmap-color': [
+        'interpolate',
+        ['linear'],
+        ['heatmap-density'],
+        0, 'rgba(0, 0, 255, 0)',
+        0.2, 'rgba(0, 255, 255, 0.5)',
+        0.4, 'rgba(0, 255, 0, 0.7)',
+        0.6, 'rgba(255, 255, 0, 0.8)',
+        0.8, 'rgba(255, 128, 0, 0.9)',
+        1, 'rgba(255, 0, 0, 1)'
+      ],
+      // 热力点大小
+      'heatmap-radius': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        10, 15,
+        15, 25
+      ],
+      // 热力强度
+      'heatmap-intensity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        10, 0.5,
+        15, 1.5
+      ],
+      // 热力图权重，使用后端提供的权重属性
+      'heatmap-weight': [
+        'case',
+        ['has', 'weight'],
+        ['get', 'weight'],
+        1
+      ],
+      // 热力图透明度
+      'heatmap-opacity': 0.8
+    }
+  }, 'waterway-label') // 热力图在水系标签下方显示
+  
+  // 默认隐藏热力图
+  mapInstance.value.setLayoutProperty('restaurants-heat-layer', 'visibility', 'none')
+}
+
+// 更新热力图数据
+const updateHeatmapData = async () => {
+  if (!mapInstance.value || !mapInstance.value.getSource('restaurants-heat')) return
+  
+  // 使用状态管理中的热力图数据
+  if (!restaurantStore.heatmap.data) {
+    // 如果没有热力图数据，则获取
+    await restaurantStore.fetchHeatmapData()
+  }
+  
+  // 如果有热力图数据，则更新地图源
+  if (restaurantStore.heatmap.data) {
+    mapInstance.value.getSource('restaurants-heat').setData(restaurantStore.heatmap.data)
+  }
+}
+
+// 切换热力图显示
+const toggleHeatmap = () => {
+  if (!mapInstance.value) return
+  
+  // 切换热力图模式
+  heatmapMode.value = !heatmapMode.value
+  
+  // 更新状态管理
+  restaurantStore.toggleHeatmap()
+  
+  if (heatmapMode.value) {
+    // 更新热力图数据
+    updateHeatmapData()
+    
+    // 显示热力图图层
+    mapInstance.value.setLayoutProperty('restaurants-heat-layer', 'visibility', 'visible')
+    
+    // 隐藏点标记（可选）
+    Object.values(markers.value).forEach(marker => {
+      marker.getElement().style.display = 'none'
+    })
+  } else {
+    // 隐藏热力图图层
+    mapInstance.value.setLayoutProperty('restaurants-heat-layer', 'visibility', 'none')
+    
+    // 显示点标记（可选）
+    Object.values(markers.value).forEach(marker => {
+      marker.getElement().style.display = 'block'
+    })
+  }
+}
+
+// 监听filteredRestaurants变化，重新渲染标记和热力图数据
 watch(() => restaurantStore.filteredRestaurants, () => {
   renderRestaurants()
+  updateHeatmapData()
 }, { deep: true })
 
 // 生命周期钩子

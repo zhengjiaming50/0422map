@@ -205,4 +205,67 @@ def add_restaurant_review(restaurant_id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 400 
+        return jsonify({"error": str(e)}), 400
+
+@restaurant_bp.route('/restaurants/heatmap-data', methods=['GET'])
+def get_heatmap_data():
+    """获取热力图数据"""
+    # 获取所有餐厅的坐标信息
+    restaurants = Restaurant.query.all()
+    
+    # 转换为GeoJSON格式
+    features = []
+    for restaurant in restaurants:
+        if restaurant.latitude and restaurant.longitude:
+            feature = {
+                "type": "Feature",
+                "properties": {
+                    "id": restaurant.id,
+                    "name": restaurant.name,
+                    "food_type": restaurant.food_type,
+                    "district": restaurant.district,
+                    # 为了增强热力图效果，为不同类型餐厅设置不同权重
+                    "weight": 1.0  # 默认权重
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [restaurant.longitude, restaurant.latitude]
+                }
+            }
+            
+            # 可以根据餐厅类型调整权重
+            if restaurant.food_type:
+                if "火锅" in restaurant.food_type:
+                    feature["properties"]["weight"] = 1.2
+                elif "小吃" in restaurant.food_type:
+                    feature["properties"]["weight"] = 1.1
+            
+            features.append(feature)
+    
+    # 获取餐厅聚集度（每个区域的餐厅数量）
+    district_counts = {}
+    district_stats = db.session.query(
+        Restaurant.district,
+        func.count(Restaurant.id).label('count')
+    ).filter(Restaurant.district != None).group_by(Restaurant.district).all()
+    
+    for stat in district_stats:
+        district_counts[stat[0]] = stat[1]
+    
+    # 根据餐厅所在区域的餐厅总数调整权重
+    for feature in features:
+        district = feature["properties"].get("district")
+        if district and district in district_counts:
+            # 区域餐厅数量越多，权重越大
+            count = district_counts[district]
+            # 对数调整，避免权重差异过大
+            density_weight = min(1.0 + (count / 10) * 0.5, 2.0)
+            feature["properties"]["weight"] *= density_weight
+    
+    # 构建最终GeoJSON对象
+    geojson = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+    
+    return jsonify(geojson) 

@@ -139,5 +139,21 @@ export const restaurantApi = {
       console.error(`提交餐厅评价失败 (ID: ${restaurantId}):`, error)
       throw error
     }
+  },
+  
+  // 获取热力图数据
+  async getHeatmapData() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurants/heatmap-data`)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('获取热力图数据失败:', error)
+      throw error
+    }
   }
 } 

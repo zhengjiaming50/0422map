@@ -21,6 +21,11 @@ export const useRestaurantStore = defineStore('restaurant', {
       active: false,
       restaurants: [],
       bounds: null
+    },
+    // 添加热力图相关状态
+    heatmap: {
+      active: false,
+      data: null
     }
   }),
 
@@ -183,6 +188,38 @@ export const useRestaurantStore = defineStore('restaurant', {
       this.boxSelection.active = false
       this.boxSelection.restaurants = []
       this.boxSelection.bounds = null
+    },
+    
+    // 获取热力图数据
+    async fetchHeatmapData() {
+      this.loading = true
+      this.error = null
+      
+      try {
+        // 调用API获取热力图数据
+        const heatmapData = await restaurantApi.getHeatmapData()
+        
+        // 更新状态
+        this.heatmap.data = heatmapData
+        
+        return heatmapData
+      } catch (error) {
+        this.error = error.message || '获取热力图数据失败'
+        console.error('获取热力图数据失败:', error)
+        return null
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 切换热力图状态
+    toggleHeatmap() {
+      this.heatmap.active = !this.heatmap.active
+      
+      // 如果激活热力图但没有数据，则获取数据
+      if (this.heatmap.active && !this.heatmap.data) {
+        this.fetchHeatmapData()
+      }
     }
   }
 }) 
