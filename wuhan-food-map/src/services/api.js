@@ -75,5 +75,21 @@ export const restaurantApi = {
       console.error('获取美食类型列表失败:', error)
       throw error
     }
+  },
+  
+  // 获取指定餐厅的评价列表
+  async getRestaurantReviews(restaurantId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/reviews`)
+      
+      if (!response.ok) {
+        throw new Error(`API错误: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error(`获取餐厅评价失败 (ID: ${restaurantId}):`, error)
+      throw error
+    }
   }
 } 

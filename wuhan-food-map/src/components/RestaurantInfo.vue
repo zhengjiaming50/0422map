@@ -41,6 +41,9 @@
       <p>{{ restaurant.description }}</p>
     </div>
     
+    <!-- 用户评价部分 -->
+    <RestaurantReviews :restaurant-id="restaurant.id" />
+    
     <div class="info-actions">
       <button class="action-btn" @click="navigateTo">
         <span>导航到这里</span>
@@ -50,6 +53,8 @@
 </template>
 
 <script setup>
+import RestaurantReviews from './RestaurantReviews.vue';
+
 const props = defineProps({
   restaurant: {
     type: Object,

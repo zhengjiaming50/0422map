@@ -1,5 +1,7 @@
 from app import create_app, db
 from app.models.restaurant import Restaurant
+from app.models.review import Review
+import datetime
 
 # 武汉餐厅示例数据
 sample_restaurants = [
@@ -96,5 +98,79 @@ def seed_data():
         db.session.commit()
         print(f"✅ 成功添加 {len(sample_restaurants)} 条餐厅记录")
 
+def seed_reviews():
+    """添加示例评价数据"""
+    print("正在添加餐厅评价数据...")
+    
+    # 为第一个餐厅添加评价
+    restaurant1 = Restaurant.query.first()
+    if restaurant1:
+        reviews1 = [
+            Review(
+                restaurant_id=restaurant1.id,
+                rating=5,
+                comment="这家餐厅的热干面真的非常好吃，面条劲道，调料香浓，强烈推荐！",
+                user_name="美食家张三"
+            ),
+            Review(
+                restaurant_id=restaurant1.id,
+                rating=4,
+                comment="环境不错，服务态度很好，就是价格稍微贵了点。",
+                user_name="李四"
+            ),
+            Review(
+                restaurant_id=restaurant1.id,
+                rating=3,
+                comment="一般般，没有特别惊艳的地方。",
+                user_name="王五"
+            )
+        ]
+        db.session.add_all(reviews1)
+    
+    # 为第二个餐厅添加评价
+    restaurant2 = Restaurant.query.offset(1).first()
+    if restaurant2:
+        reviews2 = [
+            Review(
+                restaurant_id=restaurant2.id,
+                rating=5,
+                comment="这家店的菜品真的很地道，感觉回到了老家的味道，非常推荐！",
+                user_name="赵六"
+            ),
+            Review(
+                restaurant_id=restaurant2.id,
+                rating=5,
+                comment="服务员很热情，点了他们家的招牌菜，非常美味！",
+                user_name="食客123"
+            )
+        ]
+        db.session.add_all(reviews2)
+    
+    # 为其他餐厅添加随机评价
+    restaurants = Restaurant.query.offset(2).all()
+    for restaurant in restaurants:
+        reviews = [
+            Review(
+                restaurant_id=restaurant.id,
+                rating=4,
+                comment="菜品种类丰富，味道不错，会再来的。",
+                user_name="美食爱好者"
+            ),
+            Review(
+                restaurant_id=restaurant.id,
+                rating=3,
+                comment="味道一般，但是服务很好。",
+                user_name="匿名用户"
+            )
+        ]
+        db.session.add_all(reviews)
+    
+    db.session.commit()
+    print("餐厅评价数据添加完成。")
+
 if __name__ == '__main__':
-    seed_data() 
+    app = create_app()
+    with app.app_context():
+        seed_data()
+        seed_reviews()
+        print("所有示例数据已添加完成。") 

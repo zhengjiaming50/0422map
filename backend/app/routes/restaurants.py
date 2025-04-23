@@ -3,6 +3,7 @@ from sqlalchemy import func
 from geoalchemy2 import Geometry
 from app import db
 from app.models.restaurant import Restaurant
+from app.models.review import Review
 
 # 创建蓝图
 restaurant_bp = Blueprint('restaurants', __name__)
@@ -140,4 +141,28 @@ def get_stats_by_food_type():
         func.count(Restaurant.id).label('count')
     ).filter(Restaurant.food_type != None).group_by(Restaurant.food_type).all()
     
-    return jsonify([{"food_type": stat[0], "count": stat[1]} for stat in stats]) 
+    return jsonify([{"food_type": stat[0], "count": stat[1]} for stat in stats])
+
+@restaurant_bp.route('/restaurants/<int:restaurant_id>/reviews', methods=['GET'])
+def get_restaurant_reviews(restaurant_id):
+    """获取指定餐厅的评价列表"""
+    # 确认餐厅存在
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    
+    # 获取评价列表
+    reviews = Review.query.filter_by(restaurant_id=restaurant_id).order_by(Review.created_at.desc()).all()
+    
+    # 转换为JSON格式
+    result = [review.to_dict() for review in reviews]
+    
+    # 计算平均评分
+    avg_rating = 0
+    if reviews:
+        avg_rating = sum(review.rating for review in reviews) / len(reviews)
+    
+    return jsonify({
+        "restaurant_id": restaurant_id,
+        "reviews": result,
+        "avg_rating": round(avg_rating, 1),
+        "total_reviews": len(reviews)
+    }) 
