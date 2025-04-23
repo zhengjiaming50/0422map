@@ -102,29 +102,6 @@ export const restaurantApi = {
     }
   },
   
-  // 获取餐厅密度数据，用于热力图显示
-  async getRestaurantsDensity(filters = {}) {
-    try {
-      const queryParams = new URLSearchParams()
-      
-      // 添加筛选参数
-      if (filters.district) queryParams.append('district', filters.district)
-      if (filters.foodType) queryParams.append('food_type', filters.foodType)
-      
-      const url = `${API_BASE_URL}/restaurants/density?${queryParams.toString()}`
-      const response = await fetch(url)
-      
-      if (!response.ok) {
-        throw new Error(`API错误: ${response.status}`)
-      }
-      
-      return await response.json()
-    } catch (error) {
-      console.error('获取餐厅密度数据失败:', error)
-      throw error
-    }
-  },
-  
   // 获取指定餐厅的评价列表
   async getRestaurantReviews(restaurantId) {
     try {

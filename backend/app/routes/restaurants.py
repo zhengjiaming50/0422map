@@ -56,54 +56,6 @@ def get_food_types():
     food_types = db.session.query(Restaurant.food_type).distinct().filter(Restaurant.food_type != None).all()
     return jsonify([food_type[0] for food_type in food_types])
 
-@restaurant_bp.route('/restaurants/density', methods=['GET'])
-def get_restaurants_density():
-    """获取餐厅密度数据，用于热力图显示"""
-    try:
-        # 获取筛选参数
-        district = request.args.get('district', '')
-        food_type = request.args.get('food_type', '')
-
-        # 创建基础查询
-        restaurants_query = Restaurant.query
-        
-        # 应用筛选条件
-        if district:
-            restaurants_query = restaurants_query.filter(Restaurant.district == district)
-        if food_type:
-            restaurants_query = restaurants_query.filter(Restaurant.food_type == food_type)
-        
-        restaurants = restaurants_query.all()
-        
-        # 计算餐厅密度
-        # 这里我们使用一个简单的算法：统计每个餐厅附近其他餐厅的数量，作为其权重
-        density_data = []
-        
-        for restaurant in restaurants:
-            # 创建点几何体
-            point = func.ST_SetSRID(func.ST_MakePoint(restaurant.longitude, restaurant.latitude), 4326)
-            
-            # 计算1公里内餐厅数量
-            nearby_count = db.session.query(func.count(Restaurant.id)).filter(
-                Restaurant.id != restaurant.id,
-                func.ST_DWithin(Restaurant.location, point, 0.01)  # 约1公里
-            ).scalar()
-            
-            # 设置权重上限为10（可根据实际数据调整）
-            weight = min(nearby_count + 1, 10)
-            
-            density_data.append({
-                'id': restaurant.id, 
-                'latitude': restaurant.latitude,
-                'longitude': restaurant.longitude,
-                'weight': weight
-            })
-            
-        return jsonify(density_data)
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 @restaurant_bp.route('/restaurants/nearby', methods=['GET'])
 def get_nearby_restaurants():
     """获取指定坐标附近的餐厅"""
