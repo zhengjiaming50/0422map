@@ -3,6 +3,7 @@ from sqlalchemy import func
 from geoalchemy2 import Geometry
 from app import db
 from app.models.restaurant import Restaurant
+from app.models.review import Review
 
 # 创建蓝图
 restaurant_bp = Blueprint('restaurants', __name__)
@@ -140,4 +141,50 @@ def get_stats_by_food_type():
         func.count(Restaurant.id).label('count')
     ).filter(Restaurant.food_type != None).group_by(Restaurant.food_type).all()
     
-    return jsonify([{"food_type": stat[0], "count": stat[1]} for stat in stats]) 
+    return jsonify([{"food_type": stat[0], "count": stat[1]} for stat in stats])
+
+@restaurant_bp.route('/restaurants/<int:restaurant_id>/reviews', methods=['GET'])
+def get_restaurant_reviews(restaurant_id):
+    """获取指定餐厅的所有评价"""
+    # 确认餐厅存在
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    
+    # 获取该餐厅的所有评价
+    reviews = Review.query.filter_by(restaurant_id=restaurant_id).order_by(Review.created_at.desc()).all()
+    
+    # 转换为JSON格式
+    result = [review.to_dict() for review in reviews]
+    
+    return jsonify(result)
+
+@restaurant_bp.route('/restaurants/<int:restaurant_id>/reviews', methods=['POST'])
+def add_restaurant_review(restaurant_id):
+    """添加新的餐厅评价"""
+    # 确认餐厅存在
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    
+    try:
+        # 获取请求数据
+        data = request.json
+        
+        # 验证必需字段
+        if 'rating' not in data or not isinstance(data['rating'], int) or data['rating'] < 1 or data['rating'] > 5:
+            return jsonify({"error": "评分必须是1-5之间的整数"}), 400
+        
+        # 创建新评价
+        new_review = Review(
+            restaurant_id=restaurant_id,
+            rating=data['rating'],
+            comment=data.get('comment'),
+            user_name=data.get('user_name')
+        )
+        
+        # 保存到数据库
+        db.session.add(new_review)
+        db.session.commit()
+        
+        return jsonify(new_review.to_dict()), 201
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400 

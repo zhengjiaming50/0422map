@@ -41,6 +41,77 @@
       <p>{{ restaurant.description }}</p>
     </div>
     
+    <div class="info-reviews">
+      <h4>用户评价</h4>
+      
+      <div v-if="reviews.length > 0" class="rating-summary">
+        <div class="average-rating">
+          <span class="rating-number">{{ averageRating.toFixed(1) }}</span>
+          <div class="stars">
+            <span 
+              v-for="n in 5" 
+              :key="n" 
+              :class="{ 'star-filled': n <= Math.round(averageRating), 'star': n > Math.round(averageRating) }"
+            >★</span>
+          </div>
+        </div>
+        <div class="rating-count">{{ reviews.length }}条评价</div>
+      </div>
+      <div v-else class="no-reviews">暂无评价</div>
+      
+      <div v-if="reviews.length > 0" class="review-list">
+        <div v-for="review in reviews" :key="review.id" class="review-item">
+          <div class="review-header">
+            <div class="review-stars">
+              <span v-for="n in 5" :key="n" :class="{ 'star-filled': n <= review.rating, 'star': n > review.rating }">★</span>
+            </div>
+            <div class="review-user">{{ review.user_name || '匿名用户' }}</div>
+            <div class="review-date">{{ formatDate(review.created_at) }}</div>
+          </div>
+          <div v-if="review.comment" class="review-comment">
+            {{ review.comment }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="add-review">
+        <h5>添加评价</h5>
+        
+        <div class="rating-selector">
+          <span>你的评分:</span>
+          <div class="rating-stars">
+            <span 
+              v-for="n in 5" 
+              :key="n" 
+              :class="{ 'star-filled': n <= newReview.rating, 'star': n > newReview.rating }" 
+              @click="setRating(n)"
+            >★</span>
+          </div>
+        </div>
+        
+        <div class="review-form">
+          <input 
+            type="text" 
+            v-model="newReview.user_name" 
+            placeholder="你的昵称（可选）" 
+            class="review-input"
+          />
+          <textarea 
+            v-model="newReview.comment" 
+            placeholder="说说你的体验（可选）" 
+            class="review-textarea"
+          ></textarea>
+          <button 
+            class="submit-review" 
+            @click="submitReview"
+            :disabled="!newReview.rating || submitting"
+          >
+            {{ submitting ? '提交中...' : '提交评价' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    
     <div class="info-actions">
       <button class="action-btn" @click="navigateTo">
         <span>导航到这里</span>
@@ -50,6 +121,9 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue';
+import { restaurantApi } from '../services/api';
+
 const props = defineProps({
   restaurant: {
     type: Object,
@@ -59,11 +133,74 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const navigateTo = () => {
-  // 以后实现导航功能
-  console.log('导航到:', props.restaurant.name);
-  // 可以使用百度地图、高德地图等第三方导航服务
+const reviews = ref([]);
+const loading = ref(false);
+const error = ref(null);
+const submitting = ref(false);
+
+const newReview = ref({
+  rating: 0,
+  comment: '',
+  user_name: ''
+});
+
+const averageRating = computed(() => {
+  if (reviews.value.length === 0) return 0;
+  const sum = reviews.value.reduce((total, review) => total + review.rating, 0);
+  return sum / reviews.value.length;
+});
+
+const fetchReviews = async () => {
+  loading.value = true;
+  error.value = null;
+  
+  try {
+    reviews.value = await restaurantApi.getRestaurantReviews(props.restaurant.id);
+  } catch (err) {
+    console.error('获取评价失败:', err);
+    error.value = '无法加载评价';
+  } finally {
+    loading.value = false;
+  }
 };
+
+const setRating = (rating) => {
+  newReview.value.rating = rating;
+};
+
+const submitReview = async () => {
+  if (!newReview.value.rating) return;
+  
+  submitting.value = true;
+  
+  try {
+    await restaurantApi.addRestaurantReview(props.restaurant.id, newReview.value);
+    await fetchReviews();
+    newReview.value = {
+      rating: 0,
+      comment: '',
+      user_name: ''
+    };
+  } catch (err) {
+    console.error('提交评价失败:', err);
+  } finally {
+    submitting.value = false;
+  }
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('zh-CN');
+};
+
+const navigateTo = () => {
+  console.log('导航到:', props.restaurant.name);
+};
+
+onMounted(() => {
+  fetchReviews();
+});
 </script>
 
 <style scoped>
@@ -155,6 +292,158 @@ const navigateTo = () => {
   margin: 0;
   color: #555;
   line-height: 1.5;
+}
+
+.info-reviews {
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.info-reviews h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.average-rating {
+  display: flex;
+  align-items: center;
+}
+
+.rating-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 10px;
+  color: #f1c40f;
+}
+
+.stars {
+  display: flex;
+}
+
+.star, .star-filled {
+  color: #ddd;
+  font-size: 1.2rem;
+}
+
+.star-filled {
+  color: #f1c40f;
+}
+
+.rating-count {
+  margin-left: 10px;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.no-reviews {
+  color: #777;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+.review-list {
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.review-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.review-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.review-stars {
+  margin-right: 10px;
+}
+
+.review-user {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.review-date {
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.review-comment {
+  color: #555;
+  line-height: 1.4;
+}
+
+.add-review h5 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.rating-selector {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.rating-selector span {
+  margin-right: 10px;
+  color: #555;
+}
+
+.rating-stars span {
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-input, .review-textarea {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.review-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.submit-review {
+  background-color: #1d3557;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.submit-review:hover {
+  background-color: #264a73;
+}
+
+.submit-review:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
 }
 
 .info-actions {
