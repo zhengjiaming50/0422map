@@ -3,6 +3,7 @@ from sqlalchemy import func
 from geoalchemy2 import Geometry
 from app import db
 from app.models.restaurant import Restaurant
+from app.models.review import Review
 
 # 创建蓝图
 restaurant_bp = Blueprint('restaurants', __name__)
@@ -140,4 +141,67 @@ def get_stats_by_food_type():
         func.count(Restaurant.id).label('count')
     ).filter(Restaurant.food_type != None).group_by(Restaurant.food_type).all()
     
-    return jsonify([{"food_type": stat[0], "count": stat[1]} for stat in stats]) 
+    return jsonify([{"food_type": stat[0], "count": stat[1]} for stat in stats])
+
+# 新增: 获取餐厅评价
+@restaurant_bp.route('/restaurants/<int:restaurant_id>/reviews', methods=['GET'])
+def get_restaurant_reviews(restaurant_id):
+    """获取指定餐厅的所有评价"""
+    # 确认餐厅存在
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    
+    # 获取评价
+    reviews = Review.query.filter_by(restaurant_id=restaurant_id).order_by(Review.created_at.desc()).all()
+    
+    # 计算平均评分
+    avg_rating = db.session.query(func.avg(Review.rating)).filter_by(restaurant_id=restaurant_id).scalar()
+    avg_rating = round(avg_rating, 1) if avg_rating else 0
+    
+    # 评价数量
+    review_count = len(reviews)
+    
+    # 构建响应
+    result = {
+        "reviews": [review.to_dict() for review in reviews],
+        "avg_rating": avg_rating,
+        "review_count": review_count
+    }
+    
+    return jsonify(result)
+
+# 新增: 提交餐厅评价
+@restaurant_bp.route('/restaurants/<int:restaurant_id>/reviews', methods=['POST'])
+def add_restaurant_review(restaurant_id):
+    """添加餐厅评价"""
+    # 确认餐厅存在
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    
+    # 解析请求数据
+    data = request.json
+    if not data:
+        return jsonify({"error": "无效的请求数据"}), 400
+    
+    # 验证必要字段
+    if 'rating' not in data:
+        return jsonify({"error": "评分为必填项"}), 400
+    
+    try:
+        rating = int(data['rating'])
+        if rating < 1 or rating > 5:
+            return jsonify({"error": "评分必须在1-5之间"}), 400
+    except ValueError:
+        return jsonify({"error": "评分必须是整数"}), 400
+    
+    # 创建新评价
+    review = Review(
+        restaurant_id=restaurant_id,
+        rating=rating,
+        comment=data.get('comment', ''),
+        user_name=data.get('user_name', '匿名用户')
+    )
+    
+    # 保存到数据库
+    db.session.add(review)
+    db.session.commit()
+    
+    return jsonify(review.to_dict()), 201 
