@@ -155,38 +155,6 @@ export const restaurantApi = {
       console.error('获取热力图数据失败:', error)
       throw error
     }
-  },
-  
-  // 获取按区域统计的餐厅数量
-  async getRestaurantStatsByDistrict() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/restaurants/stats/by-district`)
-      
-      if (!response.ok) {
-        throw new Error(`API错误: ${response.status}`)
-      }
-      
-      return await response.json()
-    } catch (error) {
-      console.error('获取区域统计数据失败:', error)
-      throw error
-    }
-  },
-  
-  // 获取按美食类型统计的餐厅数量
-  async getRestaurantStatsByFoodType() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/restaurants/stats/by-food-type`)
-      
-      if (!response.ok) {
-        throw new Error(`API错误: ${response.status}`)
-      }
-      
-      return await response.json()
-    } catch (error) {
-      console.error('获取美食类型统计数据失败:', error)
-      throw error
-    }
   }
 } 
 

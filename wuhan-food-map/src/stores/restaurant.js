@@ -26,11 +26,6 @@ export const useRestaurantStore = defineStore('restaurant', {
     heatmap: {
       active: false,
       data: null
-    },
-    // 添加统计数据状态
-    stats: {
-      byDistrict: [],
-      byFoodType: []
     }
   }),
 
@@ -224,42 +219,6 @@ export const useRestaurantStore = defineStore('restaurant', {
       // 如果激活热力图但没有数据，则获取数据
       if (this.heatmap.active && !this.heatmap.data) {
         this.fetchHeatmapData()
-      }
-    },
-    
-    // 获取按区域统计的餐厅数量
-    async fetchRestaurantStatsByDistrict() {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const statsByDistrict = await restaurantApi.getRestaurantStatsByDistrict()
-        this.stats.byDistrict = statsByDistrict
-        return statsByDistrict
-      } catch (error) {
-        this.error = error.message || '获取区域统计数据失败'
-        console.error('获取区域统计数据失败:', error)
-        return []
-      } finally {
-        this.loading = false
-      }
-    },
-    
-    // 获取按美食类型统计的餐厅数量
-    async fetchRestaurantStatsByFoodType() {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const statsByFoodType = await restaurantApi.getRestaurantStatsByFoodType()
-        this.stats.byFoodType = statsByFoodType
-        return statsByFoodType
-      } catch (error) {
-        this.error = error.message || '获取美食类型统计数据失败'
-        console.error('获取美食类型统计数据失败:', error)
-        return []
-      } finally {
-        this.loading = false
       }
     }
   }
