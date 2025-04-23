@@ -1,5 +1,6 @@
 from app import create_app, db
 from app.models.restaurant import Restaurant
+from app.models.review import Review
 
 def init_db():
     """初始化数据库表"""

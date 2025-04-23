@@ -21,11 +21,14 @@ body {
   background-color: #f8f8f8;
   color: #333;
   line-height: 1.6;
+  overflow: hidden;
 }
 
 .app {
   width: 100%;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 /* 响应式调整 */

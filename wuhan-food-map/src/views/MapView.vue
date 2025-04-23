@@ -5,9 +5,9 @@
       <router-link to="/" class="home-link">返回首页</router-link>
     </header>
     
-    <div class="map-container">
+    <div class="map-content">
       <div class="filter-panel-container">
-        <!-- 筛选面板将在这里实现 -->
+        <!-- 筛选面板将在下一步实现 -->
         <div class="filter-placeholder">
           <h3>筛选面板</h3>
           <p>将在下一步实现筛选和搜索功能</p>
@@ -15,61 +15,34 @@
       </div>
       
       <div class="map-wrapper">
-        <div id="map" class="mapbox-container"></div>
-        <div class="map-controls">
-          <button class="control-btn zoom-in">+</button>
-          <button class="control-btn zoom-out">-</button>
-          <button class="control-btn reset">⟳</button>
-        </div>
+        <MapContainer 
+          :initial-center="[114.3008, 30.5433]" 
+          :initial-zoom="12"
+          @map-loaded="handleMapLoaded"
+          @map-click="handleMapClick"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-
-// 临时Mapbox访问令牌，实际开发中应放在环境变量中
-const mapboxToken = 'pk.eyJ1IjoiZXhhbXBsZXVzZXIiLCJhIjoiY2xoajN2aGNuMDJpYjNkbXV1ZHB6aGxjYyJ9.example'
+import { ref } from 'vue'
+import MapContainer from '../components/MapContainer.vue'
 
 // 地图实例
-const map = ref(null)
+const mapInstance = ref(null)
 
-// 初始化地图
-const initMap = () => {
-  // 设置Mapbox访问令牌
-  mapboxgl.accessToken = mapboxToken
-  
-  // 创建地图实例
-  map.value = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [114.3008, 30.5433], // 武汉市中心坐标
-    zoom: 12
-  })
-  
-  // 添加导航控件
-  map.value.addControl(new mapboxgl.NavigationControl(), 'top-right')
-  
-  // 地图加载完成事件
-  map.value.on('load', () => {
-    console.log('地图加载完成')
-  })
+// 地图加载完成处理
+const handleMapLoaded = (map) => {
+  console.log('地图在MapView中加载完成')
+  mapInstance.value = map
 }
 
-// 组件挂载时初始化地图
-onMounted(() => {
-  initMap()
-})
-
-// 组件卸载时销毁地图
-onUnmounted(() => {
-  if (map.value) {
-    map.value.remove()
-  }
-})
+// 地图点击事件处理
+const handleMapClick = (e) => {
+  console.log('地图点击坐标:', e.lngLat)
+}
 </script>
 
 <style scoped>
@@ -77,15 +50,20 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .map-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #d32f2f;
+  background-color: #e63946;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.5rem 1rem;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 .map-header h1 {
@@ -97,63 +75,42 @@ onUnmounted(() => {
   color: white;
   text-decoration: none;
   font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
-.map-container {
+.home-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.map-content {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+  height: calc(100vh - 60px);
 }
 
 .filter-panel-container {
-  width: 300px;
-  background-color: #f5f5f5;
+  width: 250px;
+  background-color: #fff;
   border-right: 1px solid #ddd;
   padding: 1rem;
   overflow-y: auto;
+  z-index: 5;
 }
 
 .filter-placeholder {
   padding: 1rem;
-  background-color: #fff;
+  background-color: #f9f9f9;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .map-wrapper {
   flex: 1;
   position: relative;
-}
-
-.mapbox-container {
-  width: 100%;
-  height: 100%;
-}
-
-.map-controls {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.control-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: white;
-  border: 1px solid #ddd;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.control-btn:hover {
-  background-color: #f5f5f5;
+  overflow: hidden;
 }
 </style> 
