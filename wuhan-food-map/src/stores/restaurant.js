@@ -21,6 +21,12 @@ export const useRestaurantStore = defineStore('restaurant', {
       active: false,
       restaurants: [],
       bounds: null
+    },
+    // 添加热力图相关状态
+    heatmap: {
+      visible: false,
+      data: [],
+      lastUpdated: null
     }
   }),
 
@@ -38,6 +44,15 @@ export const useRestaurantStore = defineStore('restaurant', {
     getRestaurantsByFoodType: (state) => (foodType) => {
       if (!foodType) return state.restaurants
       return state.restaurants.filter(restaurant => restaurant.food_type === foodType)
+    },
+    
+    // 热力图数据格式转换
+    heatmapData: (state) => {
+      return state.heatmap.data.map(point => [
+        point.longitude,
+        point.latitude,
+        point.weight
+      ])
     }
   },
 
@@ -128,6 +143,11 @@ export const useRestaurantStore = defineStore('restaurant', {
       
       // 重新获取数据
       await this.fetchRestaurants()
+      
+      // 如果热力图可见，则更新热力图数据
+      if (this.heatmap.visible) {
+        await this.fetchHeatmapData()
+      }
     },
     
     // 重置所有筛选条件
@@ -140,6 +160,11 @@ export const useRestaurantStore = defineStore('restaurant', {
       
       // 重新获取数据
       await this.fetchRestaurants()
+      
+      // 如果热力图可见，则更新热力图数据
+      if (this.heatmap.visible) {
+        await this.fetchHeatmapData()
+      }
     },
     
     // 设置选中的餐厅
@@ -183,6 +208,44 @@ export const useRestaurantStore = defineStore('restaurant', {
       this.boxSelection.active = false
       this.boxSelection.restaurants = []
       this.boxSelection.bounds = null
+    },
+    
+    // 获取热力图数据
+    async fetchHeatmapData() {
+      this.loading = true
+      this.error = null
+      
+      try {
+        // 获取热力图数据
+        const heatmapData = await restaurantApi.getRestaurantsDensity({
+          district: this.filters.district,
+          foodType: this.filters.foodType
+        })
+        
+        // 更新热力图数据
+        this.heatmap.data = heatmapData
+        this.heatmap.lastUpdated = new Date()
+        
+        return heatmapData
+      } catch (error) {
+        this.error = error.message || '获取热力图数据失败'
+        console.error('获取热力图数据失败:', error)
+        return []
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 切换热力图显示状态
+    async toggleHeatmap() {
+      this.heatmap.visible = !this.heatmap.visible
+      
+      // 如果是打开热力图，则获取数据
+      if (this.heatmap.visible && (!this.heatmap.data.length || !this.heatmap.lastUpdated)) {
+        await this.fetchHeatmapData()
+      }
+      
+      return this.heatmap.visible
     }
   }
 }) 

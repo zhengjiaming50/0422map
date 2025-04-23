@@ -11,6 +11,12 @@
         :class="{ 'active': boxSelectionMode }" 
         title="框选区域"
       >◰</button>
+      <button 
+        @click="toggleHeatmap" 
+        class="control-btn" 
+        :class="{ 'active': heatmapVisible }" 
+        title="热力图"
+      >🔥</button>
     </div>
     <div v-if="selectedRestaurant" class="restaurant-detail-panel">
       <RestaurantInfo 
@@ -31,11 +37,20 @@
     <div v-if="boxSelectionMode" class="box-selection-hint">
       请在地图上拖动鼠标框选区域
     </div>
+    <!-- 热力图图例 -->
+    <div v-if="heatmapVisible" class="heatmap-legend">
+      <div class="legend-title">餐厅密度</div>
+      <div class="legend-gradient"></div>
+      <div class="legend-labels">
+        <span>低</span>
+        <span>高</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRestaurantStore } from '../stores/restaurant'
@@ -96,6 +111,9 @@ const boxStart = ref(null)
 // 框选矩形实例
 const boxElement = ref(null)
 
+// 热力图状态
+const heatmapVisible = computed(() => restaurantStore.heatmap.visible)
+
 // 初始化地图
 const initMap = () => {
   // 设置Token（真实项目中应从环境变量获取）
@@ -130,6 +148,8 @@ const initMap = () => {
       fetchRestaurants()
       // 初始化框选相关事件
       initBoxSelectionEvents()
+      // 初始化热力图
+      initHeatmapLayer()
     })
     
     mapInstance.value.on('click', (e) => {
@@ -308,6 +328,134 @@ const fetchRestaurantsInBox = async (bounds) => {
   }
 }
 
+// 初始化热力图图层
+const initHeatmapLayer = () => {
+  if (!mapInstance.value) return
+  
+  // 等待地图样式加载完成
+  mapInstance.value.on('style.load', () => {
+    // 如果已有热力图数据源，先移除
+    if (mapInstance.value.getSource('restaurants-heat')) {
+      mapInstance.value.removeLayer('restaurants-heat')
+      mapInstance.value.removeSource('restaurants-heat')
+    }
+    
+    // 创建热力图数据源
+    mapInstance.value.addSource('restaurants-heat', {
+      'type': 'geojson',
+      'data': {
+        'type': 'FeatureCollection',
+        'features': []
+      }
+    })
+    
+    // 创建热力图图层
+    mapInstance.value.addLayer({
+      'id': 'restaurants-heat',
+      'type': 'heatmap',
+      'source': 'restaurants-heat',
+      'layout': {
+        'visibility': 'none'
+      },
+      'paint': {
+        // 热力图权重，基于point_count属性
+        'heatmap-weight': [
+          'interpolate',
+          ['linear'],
+          ['get', 'weight'],
+          0, 0,
+          10, 1
+        ],
+        // 热力图强度
+        'heatmap-intensity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          8, 0.5,
+          16, 1.5
+        ],
+        // 色彩渐变
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, 'rgba(0, 0, 255, 0)',
+          0.2, 'rgba(0, 255, 255, 0.6)',
+          0.4, 'rgba(0, 255, 0, 0.6)',
+          0.6, 'rgba(255, 255, 0, 0.6)',
+          0.8, 'rgba(255, 128, 0, 0.7)',
+          1, 'rgba(255, 0, 0, 0.8)'
+        ],
+        // 热点半径
+        'heatmap-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          8, 10,
+          16, 40
+        ],
+        // 不透明度
+        'heatmap-opacity': 0.8
+      }
+    })
+  })
+}
+
+// 更新热力图数据
+const updateHeatmapData = () => {
+  if (!mapInstance.value || !mapInstance.value.getSource('restaurants-heat')) return
+  
+  const restaurants = restaurantStore.heatmap.data
+  
+  // 转换为GeoJSON格式
+  const geojson = {
+    type: 'FeatureCollection',
+    features: restaurants.map(restaurant => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [restaurant.longitude, restaurant.latitude]
+      },
+      properties: {
+        id: restaurant.id,
+        weight: restaurant.weight || 1
+      }
+    }))
+  }
+  
+  // 更新数据源
+  mapInstance.value.getSource('restaurants-heat').setData(geojson)
+}
+
+// 切换热力图显示状态
+const toggleHeatmap = async () => {
+  // 调用状态管理的toggleHeatmap方法
+  await restaurantStore.toggleHeatmap()
+  
+  if (!mapInstance.value || !mapInstance.value.getLayer('restaurants-heat')) return
+
+  if (restaurantStore.heatmap.visible) {
+    // 更新热力图数据
+    updateHeatmapData()
+    
+    // 显示热力图层
+    mapInstance.value.setLayoutProperty('restaurants-heat', 'visibility', 'visible')
+    
+    // 隐藏标记
+    Object.values(markers.value).forEach(marker => {
+      marker.getElement().style.display = 'none'
+    })
+  } else {
+    // 隐藏热力图层
+    mapInstance.value.setLayoutProperty('restaurants-heat', 'visibility', 'none')
+    
+    // 显示标记
+    Object.values(markers.value).forEach(marker => {
+      marker.getElement().style.display = 'flex'
+    })
+  }
+}
+
 // 切换框选模式
 const toggleBoxSelection = () => {
   // 切换框选模式
@@ -405,6 +553,11 @@ const addMarker = (restaurant) => {
   }
   
   markerElement.innerHTML = icon
+  
+  // 如果热力图显示中，则隐藏标记
+  if (restaurantStore.heatmap.visible) {
+    markerElement.style.display = 'none'
+  }
   
   // 创建Mapbox标记
   const marker = new mapboxgl.Marker(markerElement)
@@ -521,6 +674,13 @@ const resetView = () => {
 // 监听filteredRestaurants变化，重新渲染标记
 watch(() => restaurantStore.filteredRestaurants, () => {
   renderRestaurants()
+}, { deep: true })
+
+// 监听热力图数据变化，更新热力图
+watch(() => restaurantStore.heatmap.data, () => {
+  if (restaurantStore.heatmap.visible) {
+    updateHeatmapData()
+  }
 }, { deep: true })
 
 // 生命周期钩子
@@ -699,5 +859,46 @@ onUnmounted(() => {
   border-radius: 20px;
   font-size: 14px;
   z-index: 3;
+}
+
+/* 热力图图例样式 */
+.heatmap-legend {
+  position: absolute;
+  bottom: 30px;
+  right: 20px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.legend-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.legend-gradient {
+  width: 150px;
+  height: 15px;
+  margin: 5px 0;
+  background: linear-gradient(to right, 
+    rgba(0, 0, 255, 0.6) 0%, 
+    rgba(0, 255, 255, 0.6) 20%, 
+    rgba(0, 255, 0, 0.6) 40%, 
+    rgba(255, 255, 0, 0.6) 60%, 
+    rgba(255, 128, 0, 0.7) 80%, 
+    rgba(255, 0, 0, 0.8) 100%
+  );
+  border-radius: 3px;
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #555;
 }
 </style> 
