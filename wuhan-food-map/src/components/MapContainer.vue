@@ -1,30 +1,13 @@
 <template>
   <div class="map-container">
     <div id="map" ref="mapElement" class="map-element"></div>
-    <div class="map-controls">
-      <button @click="zoomIn" class="control-btn" title="放大">+</button>
-      <button @click="zoomOut" class="control-btn" title="缩小">-</button>
-      <button @click="resetView" class="control-btn" title="重置视图">⟳</button>
-      <button 
-        @click="toggleBoxSelection" 
-        class="control-btn" 
-        :class="{ 'active': boxSelectionMode }" 
-        title="框选区域"
-      >◰</button>
-      <!-- 热力图切换按钮 -->
-      <button 
-        @click="toggleHeatmap" 
-        class="control-btn" 
-        :class="{ 'active': heatmapMode }" 
-        title="切换热力图"
-      >🔥</button>
-      <!-- 路线规划按钮 -->
-      <button 
-        @click="toggleRoutePanel" 
-        class="control-btn" 
-        :class="{ 'active': routePanelActive }" 
-        title="路线规划"
-      >🗺️</button>
+    
+    <!-- 右侧控制按钮 -->
+    <div class="side-controls">
+      <button @click="toggleBoxSelection" class="control-btn" title="框选">框选</button>
+      <button @click="zoomIn" class="control-btn" title="放大">放大</button>
+      <button @click="zoomOut" class="control-btn" title="缩小">缩小</button>
+      <button @click="resetView" class="control-btn" title="复位">复位</button>
     </div>
     
     <!-- 路线规划面板 -->
@@ -44,19 +27,23 @@
         @close="closeRestaurantInfo" 
       />
     </div>
-    <div class="box-selection-panel">
+    
+    <div class="box-selection-panel" v-if="boxSelectionMode && restaurantStore.boxSelectionResults.length > 0">
       <BoxSelectionList 
         @close="closeBoxSelection"
         @select-restaurant="handleMarkerClick"
       />
     </div>
+    
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
     </div>
+    
     <!-- 框选操作提示 -->
     <div v-if="boxSelectionMode" class="box-selection-hint">
       请在地图上拖动鼠标框选区域
     </div>
+    
     <!-- 地点选择提示 -->
     <div v-if="locationPickingMode" class="location-picking-hint">
       请在地图上点击选择{{ locationPickingType === 'start' ? '起点' : '终点' }}位置
@@ -952,95 +939,77 @@ onUnmounted(() => {
 .map-element {
   width: 100%;
   height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+  background-color: #FFFFE0; /* 浅黄色背景 */
 }
 
-.map-controls {
+/* 右侧控制按钮样式 */
+.side-controls {
   position: absolute;
-  right: 20px;
   top: 50%;
+  right: 20px;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 1;
+  z-index: 10;
 }
 
 .control-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 60px;
+  height: 60px;
   background-color: #4369b2;
-  border: none;
   color: white;
-  font-size: 1.5rem;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .control-btn:hover {
-  background-color: #3a5a9b;
-  transform: scale(1.05);
-}
-
-.control-btn:active {
-  transform: scale(0.95);
+  background-color: #365b99;
 }
 
 .control-btn.active {
-  background-color: #e63946;
+  background-color: #8B4513;
 }
 
+/* 餐厅详情面板样式 */
 .restaurant-detail-panel {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
 }
 
+/* 框选面板样式 */
 .box-selection-panel {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 2;
+  top: 10px;
+  right: 10px;
+  z-index: 15;
+  max-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-.restaurant-marker {
-  background-color: #e63946;
-  color: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.restaurant-marker:hover {
-  transform: scale(1.1);
-}
-
+/* 加载状态遮罩 */
 .loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 3;
+  align-items: center;
+  z-index: 30;
 }
 
 .loading-spinner {
@@ -1055,6 +1024,29 @@ onUnmounted(() => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* 提示框样式 */
+.box-selection-hint,
+.location-picking-hint {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 4px;
+  z-index: 20;
+  font-size: 0.9rem;
+}
+
+/* 框选矩形样式 */
+:deep(.box-selection-rect) {
+  position: absolute;
+  background-color: rgba(67, 105, 178, 0.2);
+  border: 2px solid #4369b2;
+  pointer-events: none;
 }
 
 /* 餐厅标记样式 */
@@ -1082,47 +1074,6 @@ onUnmounted(() => {
   background-color: #457b9d;
   transform: scale(1.2);
   box-shadow: 0 0 0 3px rgba(69, 123, 157, 0.5), 0 3px 6px rgba(0, 0, 0, 0.3);
-  z-index: 10;
-}
-
-/* 框选矩形样式 */
-.box-selection-rect {
-  position: absolute;
-  background-color: rgba(67, 105, 178, 0.2);
-  border: 2px solid #4369b2;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.box-selection-hint {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  z-index: 3;
-}
-
-/* 添加路线规划相关样式 */
-.custom-location-marker {
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.location-picking-hint {
-  position: absolute;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
   z-index: 10;
 }
 </style> 
