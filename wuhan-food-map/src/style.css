@@ -1,22 +1,11 @@
 :root {
-  /* 赛博朋克2077风格颜色方案 */
-  --cp-yellow: #fcee0a;
-  --cp-pink: #ff2a6d;
-  --cp-cyan: #05d9e8;
-  --cp-blue: #005678;
-  --cp-dark: #1a1a1a;
-  --cp-darker: #0d0d0d;
-  --cp-light: #d1f7ff;
-  --cp-border: #ff2a6d;
-  
-  /* 字体 */
-  font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark;
-  color: var(--cp-light);
-  background-color: var(--cp-darker);
+  color-scheme: light dark;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,85 +13,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 霓虹文字效果 */
-.neon-text {
-  text-shadow: 
-    0 0 5px var(--cp-cyan),
-    0 0 10px var(--cp-cyan),
-    0 0 20px var(--cp-cyan),
-    0 0 40px var(--cp-cyan);
-}
-
-.neon-text-pink {
-  text-shadow: 
-    0 0 5px var(--cp-pink),
-    0 0 10px var(--cp-pink),
-    0 0 20px var(--cp-pink),
-    0 0 40px var(--cp-pink);
-}
-
-.neon-text-yellow {
-  text-shadow: 
-    0 0 5px var(--cp-yellow),
-    0 0 10px var(--cp-yellow),
-    0 0 20px var(--cp-yellow),
-    0 0 40px var(--cp-yellow);
-}
-
-/* 赛博边框效果 */
-.cyber-border {
-  border: 2px solid var(--cp-border);
-  box-shadow: 0 0 5px var(--cp-border), inset 0 0 5px var(--cp-border);
-  position: relative;
-}
-
-.cyber-border::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border: 2px solid var(--cp-border);
-  border-radius: inherit;
-  animation: cyber-border-pulse 2s infinite;
-}
-
-@keyframes cyber-border-pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
-}
-
 a {
   font-weight: 500;
-  color: var(--cp-cyan);
+  color: #646cff;
   text-decoration: inherit;
-  position: relative;
-  transition: all 0.3s ease;
 }
-
 a:hover {
-  color: var(--cp-pink);
-  text-shadow: 0 0 5px var(--cp-pink);
-}
-
-a::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  bottom: -4px;
-  left: 0;
-  background-color: var(--cp-pink);
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  transition: transform 0.3s ease-out;
-}
-
-a:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+  color: #535bf2;
 }
 
 body {
@@ -110,73 +27,35 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--cp-darker);
-  background-image: 
-    linear-gradient(0deg, rgba(5, 217, 232, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(5, 217, 232, 0.1) 1px, transparent 1px);
-  background-size: 30px 30px;
-  background-position: -1px -1px;
 }
 
 h1 {
-  font-size: 2.5em;
+  font-size: 2em;
   line-height: 1.1;
   margin: 0;
-  letter-spacing: 2px;
-  font-weight: 700;
-  text-transform: uppercase;
 }
 
 button {
-  position: relative;
-  border-radius: 0;
-  border: 2px solid var(--cp-cyan);
+  border-radius: 8px;
+  border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 600;
+  font-weight: 500;
   font-family: inherit;
-  background-color: transparent;
-  color: var(--cp-light);
+  background-color: #f9f9f9;
   cursor: pointer;
-  transition: all 0.25s;
-  overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  transition: border-color 0.25s;
 }
-
-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--cp-cyan);
-  opacity: 0;
-  transition: opacity 0.25s;
-  z-index: -1;
-}
-
 button:hover {
-  border-color: var(--cp-pink);
-  color: var(--cp-dark);
+  border-color: #646cff;
 }
-
-button:hover::before {
-  opacity: 0.8;
-}
-
 button:focus,
 button:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--cp-pink), 0 0 15px var(--cp-pink);
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 .card {
   padding: 2em;
-  background-color: rgba(26, 26, 26, 0.8);
-  border: 1px solid var(--cp-cyan);
-  box-shadow: 0 0 10px rgba(5, 217, 232, 0.3);
 }
 
 #app {
@@ -194,43 +73,18 @@ button:focus-visible {
   height: calc(100vh - 60px); /* 减去标题栏高度 */
   position: relative;
   overflow: hidden;
-  background-color: var(--cp-dark); /* 暗色背景与赛博朋克风格一致 */
+  background-color: #fff8dc; /* 浅黄色背景，与截图相似 */
 }
 
 /* 标题栏样式 */
 .header {
   height: 60px;
-  background-color: var(--cp-dark);
-  border-bottom: 2px solid var(--cp-pink);
-  color: var(--cp-light);
+  background-color: #e63946;
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  position: relative;
-}
-
-.header::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, var(--cp-cyan), var(--cp-pink));
-  animation: scan-line 2s linear infinite;
-}
-
-@keyframes scan-line {
-  0% {
-    opacity: 0.1;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.1;
-  }
 }
 
 /* 控制按钮样式 */
@@ -248,125 +102,25 @@ button:focus-visible {
 .map-controls button {
   width: 50px;
   height: 50px;
-  border-radius: 0;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(26, 26, 26, 0.7);
-  color: var(--cp-cyan);
+  background-color: #4369b2;
+  color: white;
   font-size: 16px;
-  box-shadow: 0 0 10px rgba(5, 217, 232, 0.3);
-  border: 1px solid var(--cp-cyan);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.map-controls button:hover {
-  color: var(--cp-pink);
-  border-color: var(--cp-pink);
-  box-shadow: 0 0 15px var(--cp-pink);
-}
-
-/* 输入框样式 */
-input, select, textarea {
-  background-color: rgba(26, 26, 26, 0.7);
-  border: 1px solid var(--cp-cyan);
-  color: var(--cp-light);
-  padding: 0.6em 1em;
-  font-family: inherit;
-  transition: all 0.3s;
-}
-
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--cp-pink);
-  box-shadow: 0 0 10px var(--cp-pink);
-}
-
-/* 添加故障艺术效果 */
-.glitch-effect {
-  position: relative;
-}
-
-.glitch-effect::before,
-.glitch-effect::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.glitch-effect::before {
-  left: 2px;
-  text-shadow: -2px 0 var(--cp-pink);
-  clip: rect(24px, 550px, 90px, 0);
-  animation: glitch-anim-1 5s linear infinite alternate-reverse;
-}
-
-.glitch-effect::after {
-  left: -2px;
-  text-shadow: -2px 0 var(--cp-cyan);
-  clip: rect(85px, 550px, 140px, 0);
-  animation: glitch-anim-2 5s linear infinite alternate-reverse;
-}
-
-@keyframes glitch-anim-1 {
-  0% { clip: rect(36px, 9999px, 28px, 0); }
-  5% { clip: rect(143px, 9999px, 142px, 0); }
-  10% { clip: rect(63px, 9999px, 147px, 0); }
-  15% { clip: rect(143px, 9999px, 48px, 0); }
-  20% { clip: rect(94px, 9999px, 44px, 0); }
-  25% { clip: rect(82px, 9999px, 5px, 0); }
-  30% { clip: rect(141px, 9999px, 98px, 0); }
-  35% { clip: rect(37px, 9999px, 122px, 0); }
-  40% { clip: rect(10px, 9999px, 31px, 0); }
-  45% { clip: rect(85px, 9999px, 147px, 0); }
-  50% { clip: rect(42px, 9999px, 31px, 0); }
-  55% { clip: rect(11px, 9999px, 55px, 0); }
-  60% { clip: rect(5px, 9999px, 147px, 0); }
-  65% { clip: rect(138px, 9999px, 28px, 0); }
-  70% { clip: rect(18px, 9999px, 145px, 0); }
-  75% { clip: rect(140px, 9999px, 13px, 0); }
-  80% { clip: rect(55px, 9999px, 145px, 0); }
-  85% { clip: rect(51px, 9999px, 17px, 0); }
-  90% { clip: rect(24px, 9999px, 71px, 0); }
-  95% { clip: rect(140px, 9999px, 27px, 0); }
-  100% { clip: rect(15px, 9999px, 15px, 0); }
-}
-
-@keyframes glitch-anim-2 {
-  0% { clip: rect(112px, 9999px, 31px, 0); }
-  5% { clip: rect(39px, 9999px, 146px, 0); }
-  10% { clip: rect(2px, 9999px, 78px, 0); }
-  15% { clip: rect(30px, 9999px, 138px, 0); }
-  20% { clip: rect(12px, 9999px, 56px, 0); }
-  25% { clip: rect(104px, 9999px, 31px, 0); }
-  30% { clip: rect(12px, 9999px, 22px, 0); }
-  35% { clip: rect(128px, 9999px, 11px, 0); }
-  40% { clip: rect(43px, 9999px, 50px, 0); }
-  45% { clip: rect(12px, 9999px, 81px, 0); }
-  50% { clip: rect(141px, 9999px, 131px, 0); }
-  55% { clip: rect(35px, 9999px, 97px, 0); }
-  60% { clip: rect(67px, 9999px, 37px, 0); }
-  65% { clip: rect(138px, 9999px, 125px, 0); }
-  70% { clip: rect(39px, 9999px, 87px, 0); }
-  75% { clip: rect(95px, 9999px, 104px, 0); }
-  80% { clip: rect(37px, 9999px, 129px, 0); }
-  85% { clip: rect(147px, 9999px, 83px, 0); }
-  90% { clip: rect(104px, 9999px, 147px, 0); }
-  95% { clip: rect(144px, 9999px, 29px, 0); }
-  100% { clip: rect(66px, 9999px, 128px, 0); }
-}
-
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    color: var(--cp-light);
-    background-color: var(--cp-darker);
+    color: #213547;
+    background-color: #ffffff;
   }
   a:hover {
-    color: var(--cp-pink);
+    color: #747bff;
   }
   button {
-    background-color: transparent;
+    background-color: #f9f9f9;
   }
 }
