@@ -21,14 +21,16 @@ body {
   background-color: #f8f8f8;
   color: #333;
   line-height: 1.6;
-  overflow: hidden;
+  overflow-x: hidden; /* 只隐藏水平滚动条 */
+  overflow-y: auto; /* 允许垂直滚动 */
 }
 
 .app {
   width: 100%;
   height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden; /* 只隐藏水平滚动条 */
+  overflow-y: auto; /* 允许垂直滚动 */
 }
 
 /* 响应式调整 */

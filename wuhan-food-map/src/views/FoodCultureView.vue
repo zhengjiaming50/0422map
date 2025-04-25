@@ -5,17 +5,11 @@
       <p class="subtitle">千年江城的味蕾记忆</p>
     </header>
 
-    <div class="culture-nav">
-      <a href="#intro" class="nav-item">文化简介</a>
-      <a href="#famous-food" class="nav-item">特色名菜</a>
-      <a href="#food-streets" class="nav-item">美食街区</a>
-      <router-link to="/food-route" class="nav-item special">一日美食路线</router-link>
-    </div>
 
     <section id="intro" class="culture-section">
       <h2>武汉美食文化简介</h2>
       <div class="culture-content">
-        <img src="https://p1-q.mafengwo.net/s12/M00/5D/D7/wKgED1urUEyACSHYAAHXV0ZK9SU72.jpeg" alt="武汉美食总览" class="culture-image" />
+        <!-- <img src="https://p1-q.mafengwo.net/s12/M00/5D/D7/wKgED1urUEyACSHYAAHXV0ZK9SU72.jpeg" alt="武汉美食总览" class="culture-image" /> -->
         <div class="culture-text">
           <p>武汉，这座有着3500多年历史的江城，是长江中游地区的核心城市，也是中华饮食文化的重要代表城市之一。武汉美食融合了楚菜的精华，同时吸收了全国各地的烹饪技术，形成了独特的"江湖风味"。</p>
           <p>武汉美食以其"早点文化"闻名全国，从热干面到豆皮、鸭脖，再到各式小吃，每一道都承载着这座城市的历史与温度。武汉人喜欢吃早点的习惯可追溯到民国时期，如今已成为城市文化的重要标识。</p>
@@ -28,7 +22,7 @@
       <h2>武汉特色名菜</h2>
       
       <div class="food-card">
-        <img src="https://pic3.zhimg.com/80/v2-afb73698ea7c1e5b828ec1a06c85e913_720w.jpg" alt="热干面" class="food-image" />
+        <img src="/img/hot-dry-noodles.jpg" alt="热干面" class="food-image" />
         <div class="food-info">
           <h3>热干面</h3>
           <div class="food-tags">
@@ -42,7 +36,7 @@
       </div>
 
       <div class="food-card reverse">
-        <img src="https://youimg1.c-ctrip.com/target/100h0y000000m1mb0D9D3.jpg" alt="豆皮" class="food-image" />
+        <!-- <img src="https://youimg1.c-ctrip.com/target/100h0y000000m1mb0D9D3.jpg" alt="豆皮" class="food-image" /> -->
         <div class="food-info">
           <h3>豆皮</h3>
           <div class="food-tags">
@@ -56,7 +50,7 @@
       </div>
 
       <div class="food-card">
-        <img src="https://youimg1.c-ctrip.com/target/100k0z000000nunaaE86B.jpg" alt="鸭脖" class="food-image" />
+        <!-- <img src="https://youimg1.c-ctrip.com/target/100k0z000000nunaaE86B.jpg" alt="鸭脖" class="food-image" /> -->
         <div class="food-info">
           <h3>武汉鸭脖</h3>
           <div class="food-tags">
@@ -108,13 +102,16 @@
   padding: 20px;
   background-color: #fff;
   min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
 }
 
 .culture-header {
   text-align: center;
   padding: 30px 0;
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-              url('https://youimg1.c-ctrip.com/target/100j1f000001gqb2iE27D.jpg') center/cover no-repeat;
+              url('/img/culture-header-bg.jpg') center/cover no-repeat;
   color: white;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -186,7 +183,7 @@
 
 @media (min-width: 768px) {
   .culture-content {
-    flex-direction: row;
+    /* flex-direction: row; /* 移除图片后，不再需要强制横向排列 */
   }
 }
 
@@ -195,6 +192,7 @@
   max-width: 400px;
   border-radius: 8px;
   object-fit: cover;
+  /* margin: 0 auto 20px auto; /* 如果希望单张图片居中 */
 }
 
 .culture-text {
@@ -227,9 +225,9 @@
 }
 
 .food-image {
-  width: 100%;
-  max-width: 300px;
-  height: 250px;
+  /* width: 100%; /* 移除这个，避免图片撑满容器 */
+  max-width: 300px; /* 限制图片最大宽度 */
+  height: auto;     /* 高度自动，保持比例 */
   object-fit: cover;
 }
 
@@ -286,8 +284,9 @@
 }
 
 .route-promo {
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-              url('https://youimg1.c-ctrip.com/target/100a1f000001grvzx2AB8.jpg') center/cover no-repeat;
+  /* background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+              url('https://youimg1.c-ctrip.com/target/100a1f000001grvzx2AB8.jpg') center/cover no-repeat; */
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
   color: white;
   text-align: center;
   padding: 40px 20px;

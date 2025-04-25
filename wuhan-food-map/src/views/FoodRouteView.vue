@@ -88,14 +88,6 @@
       </div>
     </div>
 
-    <div class="route-map">
-      <h3>路线地图预览</h3>
-      <div class="map-placeholder">
-        <p>此处将显示路线地图（静态演示）</p>
-        <img src="https://www.seekseas.com/uploadfiles/imgupdate/wuhan-subway-map.jpg" alt="武汉地铁图" class="map-image">
-      </div>
-      <router-link to="/map" class="map-btn">查看完整地图</router-link>
-    </div>
   </div>
 </template>
 
@@ -119,7 +111,6 @@ const routes = ref([
         name: "蔡林记",
         type: "早餐",
         address: "武汉市武昌区洪山区珞瑜路20号",
-        image: "https://img.zcool.cn/community/01caaa5c9189c2a801213867c5d2ab.jpg",
         description: "创建于1931年的老字号，以地道的热干面和豆皮著称，是体验武汉早点文化的必去之地。",
         recommended_dishes: ["热干面", "豆皮", "面窝"],
         tips: "早上8点前去可避开早高峰人流，建议点一碗热干面配一张豆皮，体验最经典的武汉早餐搭配。"
@@ -129,7 +120,6 @@ const routes = ref([
         name: "户部巷",
         type: "小吃街",
         address: "武汉市武昌区解放路特1号",
-        image: "https://p1-q.mafengwo.net/s10/M00/9D/7B/wKgBZ1oyhTCAesUgAAU8a_VfkOo17.jpeg",
         description: "武汉著名的小吃街，汇集了众多武汉特色小吃，是了解武汉饮食文化的窗口。",
         recommended_dishes: ["鸭脖子", "面窝", "糊汤粉", "小龙虾"],
         tips: "巷子不长但店铺众多，可以少量多尝，不要一次点太多。"
@@ -139,7 +129,6 @@ const routes = ref([
         name: "老通城",
         type: "午餐",
         address: "武汉市武昌区解放路372号",
-        image: "https://p0.itc.cn/q_70/images03/20200731/8a3b5f87c0c046af90a52e35e0b58183.jpeg",
         description: "创立于1920年的百年老店，以糯米甜点和鸭脖闻名，是武汉人喜爱的传统小吃店。",
         recommended_dishes: ["三鲜豆皮", "糯米包油条", "鸭脖"],
         tips: "老通城的甜食偏甜，如果不喜欢太甜的口味可以提前告知。"
@@ -149,7 +138,6 @@ const routes = ref([
         name: "简朴寨",
         type: "下午茶",
         address: "武汉市武昌区司门口解放路190号",
-        image: "https://img.zcool.cn/community/01f5835c81aa27a801213867be3d17.jpg",
         description: "以农家菜和本土小吃为主的餐厅，环境古朴，菜品地道实惠。",
         recommended_dishes: ["藕夹", "热干面", "汤包"],
         tips: "他们家的藕夹非常有名，香脆可口，一定要尝试。"
@@ -159,7 +147,6 @@ const routes = ref([
         name: "湖锦酒楼",
         type: "晚餐",
         address: "武汉市武昌区中南路7号",
-        image: "https://5b0988e595225.cdn.sohucs.com/images/20200415/83f31bc5fa214002a3ef3f7ee585a688.jpeg",
         description: "正宗的湖北菜馆，以武昌鱼和莲藕系列菜品闻名，环境优雅，适合晚餐。",
         recommended_dishes: ["清蒸武昌鱼", "藕带炒肉", "毛血旺", "糍粑鱼"],
         tips: "武昌鱼需要提前预订，建议下午致电餐厅预留。"
@@ -184,7 +171,6 @@ const routes = ref([
         name: "谌记热干面",
         type: "早餐",
         address: "武汉市江岸区胜利街18号",
-        image: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.rmb.bdstatic.com%2F16daad12acea0cd9c3f945c4b85d2fa02763.jpeg",
         description: "位于武汉最古老区域之一的早点店，以正宗的热干面、灌汤包和豆皮为特色。",
         recommended_dishes: ["热干面", "灌汤包", "豆浆"],
         tips: "他家的热干面偏辣，如果不能吃辣可以提前告知。"
@@ -194,7 +180,6 @@ const routes = ref([
         name: "黄鹤楼公园",
         type: "景点",
         address: "武汉市武昌区蛇山西山坡特1号",
-        image: "https://youimg1.c-ctrip.com/target/1A0t12000000s3n575CC2.jpg",
         description: "游览武汉地标景点，远眺长江美景，为接下来的美食之旅积攒食欲。",
         tips: "公园内有不少小吃摊，但价格偏高，建议在外面餐厅用餐。"
       },
@@ -203,7 +188,6 @@ const routes = ref([
         name: "湖北佬",
         type: "午餐",
         address: "武汉市武昌区解放路23号",
-        image: "https://img.zcool.cn/community/01c30a5ab24bd0a8012062e30cc252.jpg",
         description: "以江鲜和地方家常菜闻名的餐厅，菜品种类丰富，口味正宗。",
         recommended_dishes: ["江团鱼煲", "清蒸武昌鱼", "鱼香茄子"],
         tips: "点菜时可以咨询服务员当季新鲜江鲜，通常会有特价。"
@@ -213,7 +197,6 @@ const routes = ref([
         name: "江滨公园",
         type: "景点",
         address: "武汉市汉口江滨路",
-        image: "https://youimg1.c-ctrip.com/target/100w11000000qtwnlE18F.jpg",
         description: "沿江散步，欣赏武汉长江大桥和两岸风光，消化午餐，准备品尝下一站美食。",
         tips: "傍晚时分江边风景最美，也是拍照的好时机。"
       },
@@ -222,7 +205,6 @@ const routes = ref([
         name: "吉庆街",
         type: "晚餐",
         address: "武汉市江汉区吉庆街",
-        image: "https://youimg1.c-ctrip.com/target/100j0y000000m0bsaC73E.jpg",
         description: "武汉著名的美食街，有众多老字号餐厅，夜晚灯火通明，氛围热闹。",
         recommended_dishes: ["四季美汤包", "周黑鸭", "花样年华小龙虾"],
         tips: "晚上6点后开始热闹，很多店铺会排队，建议提前到达。"
@@ -232,7 +214,6 @@ const routes = ref([
         name: "江汉路步行街",
         type: "夜宵",
         address: "武汉市江汉区江汉路",
-        image: "https://youimg1.c-ctrip.com/target/100u1f000001gr0jgC464.jpg",
         description: "武汉最繁华的商业街之一，晚上有众多地道小吃和甜品店，是夜宵的理想去处。",
         recommended_dishes: ["三色冰激凌", "豆皮馄饨", "热干面"],
         tips: "步行街的甜品店大多营业到深夜，是结束一天美食之旅的完美收尾。"
@@ -257,7 +238,6 @@ const routes = ref([
         name: "老谦记热干面",
         type: "早午餐",
         address: "武汉市洪山区珞瑜路20号",
-        image: "https://p0.meituan.net/deal/dbb1b6d5c2f79b2af0d8ce3e42f91a6d118209.jpg",
         description: "在抖音等平台爆红的热干面店，每天都有长队，以传统工艺制作的热干面和创新小吃闻名。",
         recommended_dishes: ["招牌热干面", "爆浆鸡蛋饼", "小龙虾豆皮"],
         tips: "早上10点左右人相对较少，建议这个时间段前往。"
@@ -267,7 +247,6 @@ const routes = ref([
         name: "楚留香小龙虾",
         type: "午餐",
         address: "武汉市洪山区光谷广场步行街",
-        image: "https://p0.meituan.net/merchantpic/e8a91220dfe5f68b05b662cc96da45311019863.jpg",
         description: "以创新口味小龙虾著称的网红店，店内装修时尚，是年轻人喜爱的打卡地。",
         recommended_dishes: ["十三香小龙虾", "蒜香小龙虾", "虾滑豆腐煲"],
         tips: "点小龙虾时可以选择不同辣度，服务员会提供一次性手套。"
@@ -277,7 +256,6 @@ const routes = ref([
         name: "文和友小吃",
         type: "下午茶",
         address: "武汉市武昌区街道口阜华大厦1楼",
-        image: "https://p1.meituan.net/merchantpic/6c1d08675a97eda857d7b4975690e458491792.jpg",
         description: "复古风网红小吃店，以怀旧装修和创新武汉小吃走红，经常有网红主播直播打卡。",
         recommended_dishes: ["铁板鱿鱼", "爆浆鸡蛋糕", "冰粉"],
         tips: "店内场景非常适合拍照，可以多带几套衣服来此打卡。"
@@ -287,7 +265,6 @@ const routes = ref([
         name: "武汉天地",
         type: "休闲",
         address: "武汉市江岸区中山大道1515号",
-        image: "https://youimg1.c-ctrip.com/target/100q0y000000m1it72787.jpg",
         description: "武汉高端商业区，有许多网红咖啡店和甜品店，适合晚餐前小憩。",
         recommended_dishes: ["脏脏包", "喜茶", "奈雪的茶"],
         tips: "这里的甜品咖啡价格偏高，但环境优美，值得一坐。"
@@ -297,7 +274,6 @@ const routes = ref([
         name: "花样年华",
         type: "晚餐",
         address: "武汉市武昌区中南路68号",
-        image: "https://zxcxy-1310564939.cos.ap-chengdu.myqcloud.com/1684290344423.jpg",
         description: "融合了传统与现代的创意湖北菜餐厅，环境精致，菜品美观，是社交媒体热门打卡地。",
         recommended_dishes: ["梅菜扣肉", "荷包豆皮", "糍粑鲜鱼"],
         tips: "晚餐时段需要提前预约，菜品分量适中，适合多人共享。"
@@ -320,13 +296,16 @@ const routes = ref([
   padding: 20px;
   background-color: #fff;
   min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
 }
 
 .route-header {
   text-align: center;
   padding: 30px 0;
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-              url('https://youimg1.c-ctrip.com/target/100f10000000oclxm6934.jpg') center/cover no-repeat;
+              url('/img/route-header-bg.jpg') center/cover no-repeat;
   color: white;
   border-radius: 8px;
   margin-bottom: 20px;

@@ -12,9 +12,6 @@
           <select v-model="startPoint" class="location-select">
             <option value="">请选择起点</option>
             <option value="user_location" v-if="userLocation">当前位置</option>
-            <option v-for="restaurant in restaurants" :key="`start-${restaurant.id}`" :value="restaurant.id">
-              {{ restaurant.name }}
-            </option>
           </select>
           <button class="map-pick-btn" @click="startPickingMode('start')" title="在地图上选择">📍</button>
         </div>
@@ -26,9 +23,6 @@
           <select v-model="endPoint" class="location-select">
             <option value="">请选择终点</option>
             <option value="user_location" v-if="userLocation">当前位置</option>
-            <option v-for="restaurant in restaurants" :key="`end-${restaurant.id}`" :value="restaurant.id">
-              {{ restaurant.name }}
-            </option>
           </select>
           <button class="map-pick-btn" @click="startPickingMode('end')" title="在地图上选择">📍</button>
         </div>
