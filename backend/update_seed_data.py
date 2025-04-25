@@ -16,7 +16,7 @@ sample_restaurants = [
         'description': '以热干面、豆皮等武汉特色小吃为主',
         'business_hours': '周一至周日 9:00-22:00',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_1.jpg' # 热干面
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/bb1e003cfb3a2dcc.jpg' # 热干面
     },
     {
         'name': '江汉路步行街小龙虾',
@@ -28,7 +28,7 @@ sample_restaurants = [
         'description': '武汉特色麻辣小龙虾，肉质鲜嫩',
         'business_hours': '周一至周日 17:00-02:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_2.jpg' # 麻辣小龙虾
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/62d33eec5be3ab00.jpg' # 麻辣小龙虾
     },
     {
         'name': '户部巷老通城',
@@ -40,7 +40,7 @@ sample_restaurants = [
         'description': '百年老字号，专营三鲜豆皮',
         'business_hours': '周一至周日 8:00-20:00',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_3.jpg' # 三鲜豆皮
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/97ded6520cfcce71.jpg' # 三鲜豆皮
     },
     {
         'name': '楚河汉街烧烤',
@@ -52,7 +52,7 @@ sample_restaurants = [
         'description': '特色烤鱼，秘制调料，外焦里嫩',
         'business_hours': '周一至周日 17:00-02:00',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_4.jpg' # 烤鱼
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/b12701ac74927856.jpg' # 烤鱼
     },
     {
         'name': '光谷步行街西餐厅',
@@ -64,7 +64,7 @@ sample_restaurants = [
         'description': '西式简餐，特色牛排和意面',
         'business_hours': '周一至周日 11:00-22:00',
         'district': '洪山区',
-        'image_url': '/images/restaurants/restaurant_5.jpg' # 牛排
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/43a568f975f96178.jpg' # 牛排
     },
     {
         'name': '老字号蔡林记',
@@ -76,7 +76,7 @@ sample_restaurants = [
         'description': '经典黑芝麻酱热干面，武汉必吃',
         'business_hours': '周一至周日 6:00-21:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_6.jpg' # 蔡林记热干面
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/0a3451e85cf5092d.jpg' # 蔡林记热干面
     },
     {
         'name': '四季美汤包馆',
@@ -88,7 +88,7 @@ sample_restaurants = [
         'description': '皮薄馅足，汤汁鲜美的汤包',
         'business_hours': '周一至周日 7:00-20:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_7.jpg' # 汤包
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/faafcd471bb22b65.jpg' # 汤包
     },
     {
         'name': '武昌鱼馆总店',
@@ -100,7 +100,7 @@ sample_restaurants = [
         'description': '正宗清蒸武昌鱼，肉质细嫩鲜美',
         'business_hours': '周一至周日 10:00-21:30',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_8.jpg' # 清蒸武昌鱼
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/2cd33f456fb5ebbe.jpg' # 清蒸武昌鱼
     },
     {
         'name': '汉口精武鸭脖',
@@ -112,7 +112,7 @@ sample_restaurants = [
         'description': '麻辣鲜香的鸭脖，武汉特产',
         'business_hours': '周一至周日 10:00-23:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_9.jpg' # 鸭脖
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/17bee81dd2b0d9f0.jpg' # 鸭脖
     },
     {
         'name': '粮道街油饼包烧麦',
@@ -124,7 +124,7 @@ sample_restaurants = [
         'description': '油饼包裹着糯米烧麦，独特口感',
         'business_hours': '周一至周日 6:00-14:00',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_10.jpg' # 油饼包烧麦
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/94aa24a0976a2c79.jpg' # 油饼包烧麦
     },
     {
         'name': '徐嫂糊汤粉',
@@ -136,7 +136,7 @@ sample_restaurants = [
         'description': '鲜鱼熬制的糊汤搭配细粉，配油条更佳',
         'business_hours': '周一至周日 6:00-13:00',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_11.jpg' # 糊汤粉
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/a1c13285b6ce86ee.jpg' # 糊汤粉
     },
     {
         'name': '东湖排骨藕汤',
@@ -148,7 +148,7 @@ sample_restaurants = [
         'description': '粉糯的洪湖藕与排骨慢炖，汤鲜味美',
         'business_hours': '周一至周日 10:30-21:00',
         'district': '洪山区',
-        'image_url': '/images/restaurants/restaurant_12.jpg' # 排骨藕汤
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/8f43b94f1c879be5.jpg' # 排骨藕汤
     },
     {
         'name': '亢龙太子酒轩(临江总店)',
@@ -160,7 +160,7 @@ sample_restaurants = [
         'description': '高档粤菜餐厅，适合商务宴请',
         'business_hours': '周一至周日 11:00-14:00, 17:00-21:00',
         'district': '江岸区',
-        'image_url': '/images/restaurants/restaurant_13.jpg' # 精致粤菜点心
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/e166efb6af9a00a8.jpg' # 精致粤菜点心
     },
     {
         'name': '巴厘龙虾(万松园总店)',
@@ -172,7 +172,7 @@ sample_restaurants = [
         'description': '油焖大虾是招牌，口味多样',
         'business_hours': '周一至周日 16:00-03:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_14.jpg' # 油焖大虾
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/7127dc2f82c1eee5.jpg' # 油焖大虾
     },
     {
         'name': '靓靓蒸虾(雪松路总店)',
@@ -184,7 +184,7 @@ sample_restaurants = [
         'description': '清蒸小龙虾，原汁原味，蘸料独特',
         'business_hours': '周一至周日 11:00-02:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_15.jpg' # 清蒸小龙虾
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/bfbfe8a969f888c3.jpg' # 清蒸小龙虾
     },
     {
         'name': '老街烧烤(万达店)',
@@ -196,7 +196,7 @@ sample_restaurants = [
         'description': '种类丰富的烧烤，烤鸡爪、烤茄子受欢迎',
         'business_hours': '周一至周日 17:00-02:00',
         'district': '武昌区',
-        'image_url': '/images/restaurants/restaurant_16.jpg' # 烤鸡爪
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/45fa2b9cb507b7a7.jpg' # 烤鸡爪
     },
     {
         'name': '严氏烧麦(自治街店)',
@@ -208,7 +208,7 @@ sample_restaurants = [
         'description': '重油烧麦，胡椒味浓郁，糯米软糯',
         'business_hours': '周一至周日 6:00-14:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_17.jpg' # 重油烧麦
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/66a63a18d7896617.jpg' # 重油烧麦
     },
     {
         'name': '德华楼(汉口总店)',
@@ -220,7 +220,7 @@ sample_restaurants = [
         'description': '包子、年糕、水饺等传统汉味小吃',
         'business_hours': '周一至周日 7:00-20:00',
         'district': '江汉区',
-        'image_url': '/images/restaurants/restaurant_18.jpg' # 德华楼包子
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/df05772c766ee9ce.jpg' # 德华楼包子
     },
     {
         'name': '田师傅热干面(山海关路店)',
@@ -232,7 +232,7 @@ sample_restaurants = [
         'description': '酱料浓郁，面条劲道，本地人喜爱的热干面馆',
         'business_hours': '周一至周日 6:00-14:00',
         'district': '江岸区',
-        'image_url': '/images/restaurants/restaurant_19.jpg' # 田师傅热干面
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/974d478f8867f264.jpg' # 田师傅热干面
     },
     {
         'name': '毛肚火锅(街道口店)',
@@ -244,7 +244,7 @@ sample_restaurants = [
         'description': '新鲜毛肚是特色，重庆风味麻辣火锅',
         'business_hours': '周一至周日 11:00-22:00',
         'district': '洪山区',
-        'image_url': '/images/restaurants/restaurant_20.jpg' # 毛肚火锅
+        'image_url': 'https://cdn-fusion.imgcdn.store/i/2025/75e80ee183170b5c.jpg' # 毛肚火锅
     }
 ]
 

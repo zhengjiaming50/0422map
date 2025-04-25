@@ -5,8 +5,8 @@
       <button class="close-btn" @click="$emit('close')">&times;</button>
     </div>
     
-    <div v-if="restaurant.image_url" class="info-image">
-      <img :src="restaurant.image_url" :alt="restaurant.name">
+    <div class="info-image">
+      <img :src="getLocalImage(restaurant.food_type)" :alt="restaurant.name">
     </div>
     
     <div class="info-content">
@@ -54,6 +54,14 @@
 
 <script setup>
 import RestaurantReviews from './RestaurantReviews.vue';
+import hubeiImg from '../assets/images/hubei.jpg';
+import xiaochiImg from '../assets/images/xiaochi.jpg';
+import cakeImg from '../assets/images/cake.jpg';
+import bbqImg from '../assets/images/bbq.jpg';
+import westernImg from '../assets/images/western.jpg';
+import hotpotImg from '../assets/images/hotpot.jpg';
+import cantonImg from '../assets/images/canton.jpg';
+import defaultImg from '../assets/images/default-food.jpg';
 
 const props = defineProps({
   restaurant: {
@@ -63,6 +71,51 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close']);
+
+// 根据食物类型返回颜色
+const getFoodTypeColor = (foodType) => {
+  const colorMap = {
+    '湖北菜': '#e63946',
+    '小吃': '#f4a261',
+    '糕点': '#e9c46a',
+    '烧烤': '#d62828',
+    '西餐': '#457b9d',
+    '火锅': '#bc6c25',
+    '粤菜': '#2a9d8f'
+  };
+  
+  return colorMap[foodType] || '#6c757d';
+};
+
+// 根据食物类型返回表情符号
+const getFoodTypeEmoji = (foodType) => {
+  const emojiMap = {
+    '湖北菜': '🍜',
+    '小吃': '🥟',
+    '糕点': '🍰',
+    '烧烤': '🍢',
+    '西餐': '🍔',
+    '火锅': '🍲',
+    '粤菜': '🥘'
+  };
+  
+  return emojiMap[foodType] || '🍽️';
+};
+
+// 根据食物类型返回本地图片
+const getLocalImage = (foodType) => {
+  const imageMap = {
+    '湖北菜': hubeiImg,
+    '小吃': xiaochiImg,
+    '糕点': cakeImg,
+    '烧烤': bbqImg,
+    '西餐': westernImg,
+    '火锅': hotpotImg,
+    '粤菜': cantonImg
+  };
+  
+  return imageMap[foodType] || defaultImg;
+};
 
 const navigateTo = () => {
   // 以后实现导航功能
