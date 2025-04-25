@@ -1,21 +1,21 @@
 <template>
   <div class="home">
-    <header class="home-header">
-      <h1>武汉美食地图</h1>
-      <p class="subtitle">探索武汉特色美食，发现城市美食文化</p>
+    <header class="home-header cyber-border">
+      <h1 class="glitch-effect neon-text">武汉美食地图</h1>
     </header>
     
     <main class="home-content">
-      <div class="intro-card">
-        <h2>欢迎使用武汉美食地图系统</h2>
-        <p>这里汇集了武汉各区域的特色餐厅和美食，点击下方按钮开始你的美食探索之旅。</p>
+      <div class="intro-card cyber-border">
+        <h2 class="neon-text-pink">欢迎使用武汉美食地图系统</h2>
         <div class="actions">
-          <router-link to="/map" class="map-btn">进入地图</router-link>
-          <router-link to="/stats" class="stats-btn">查看统计</router-link>
-          <router-link to="/food-culture" class="culture-btn">美食文化</router-link>
+          <router-link to="/map" class="cyber-btn">进入地图</router-link>
+          <router-link to="/stats" class="cyber-btn cyber-btn-blue">查看统计</router-link>
+          <router-link to="/food-culture" class="cyber-btn cyber-btn-yellow">美食文化</router-link>
         </div>
       </div>
     </main>
+
+    <div class="cyber-lines"></div>
   </div>
 </template>
 
@@ -30,21 +30,43 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(0deg, rgba(5, 217, 232, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(5, 217, 232, 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: -1;
 }
 
 .home-header {
   margin-bottom: 2rem;
+  padding: 2rem;
+  background-color: rgba(26, 26, 26, 0.8);
 }
 
 h1 {
-  font-size: 2.5rem;
-  color: #d32f2f;
+  font-size: 3.5rem;
   margin-bottom: 0.5rem;
+  letter-spacing: 3px;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
 }
 
 .subtitle {
-  font-size: 1.2rem;
-  color: #666;
+  font-size: 1.5rem;
+  color: var(--cp-cyan);
+  font-weight: 300;
+  letter-spacing: 2px;
 }
 
 .home-content {
@@ -52,66 +74,107 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1;
 }
 
 .intro-card {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: rgba(13, 13, 13, 0.85);
+  padding: 2.5rem;
   max-width: 600px;
+  position: relative;
+}
+
+.intro-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, var(--cp-cyan), transparent, var(--cp-pink));
+  opacity: 0.05;
+  z-index: -1;
+}
+
+.intro-card p {
+  color: var(--cp-light);
+  line-height: 1.6;
+  margin: 1.5rem 0;
 }
 
 .actions {
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.map-btn {
+.cyber-btn {
   display: inline-block;
-  background-color: #d32f2f;
-  color: white;
   padding: 0.8rem 2rem;
-  border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
-  transition: background-color 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  background-color: transparent;
+  color: var(--cp-light);
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 10px var(--cp-cyan), inset 0 0 10px var(--cp-cyan);
+  transition: all 0.3s;
+  overflow: hidden;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-.map-btn:hover {
-  background-color: #b71c1c;
+.cyber-btn:hover {
+  color: var(--cp-dark);
+  background-color: var(--cp-cyan);
+  text-shadow: none;
 }
 
-.stats-btn {
-  display: inline-block;
-  background-color: #1976d2;
-  color: white;
-  padding: 0.8rem 2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s;
+.cyber-btn-blue {
+  border-color: var(--cp-blue);
+  box-shadow: 0 0 10px var(--cp-blue), inset 0 0 10px var(--cp-blue);
 }
 
-.stats-btn:hover {
-  background-color: #0d47a1;
+.cyber-btn-blue:hover {
+  background-color: var(--cp-blue);
 }
 
-.culture-btn {
-  display: inline-block;
-  background-color: #f57c00;
-  color: white;
-  padding: 0.8rem 2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s;
+.cyber-btn-yellow {
+  border-color: var(--cp-yellow);
+  box-shadow: 0 0 10px var(--cp-yellow), inset 0 0 10px var(--cp-yellow);
 }
 
-.culture-btn:hover {
-  background-color: #e65100;
+.cyber-btn-yellow:hover {
+  background-color: var(--cp-yellow);
+}
+
+@media (max-width: 768px) {
+  .home {
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .intro-card {
+    padding: 1.5rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .cyber-btn {
+    width: 100%;
+  }
 }
 </style> 
