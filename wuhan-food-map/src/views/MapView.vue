@@ -1,13 +1,11 @@
 <template>
   <div class="map-view">
     <header class="map-header">
-      <h1>成都美食系统</h1>
+      <h1>武汉美食地图</h1>
       <div class="nav-links">
-        <a href="#" class="nav-link">搜索区</a>
-        <a href="#" class="nav-link">热力图</a>
-        <a href="#" class="nav-link">路线规划</a>
-        <a href="#" class="nav-link">美食文化</a>
-        <a href="#" class="nav-link">柱状图</a>
+        <router-link to="/" class="home-link">返回首页</router-link>
+        <router-link to="/stats" class="stats-link">查看统计</router-link>
+        <router-link to="/food-culture" class="culture-link">美食文化</router-link>
       </div>
     </header>
     
@@ -42,7 +40,7 @@
       
       <div class="map-wrapper">
         <MapContainer 
-          :initial-center="[104.0649, 30.5702]" 
+          :initial-center="[114.3008, 30.5433]" 
           :initial-zoom="12"
           @map-loaded="handleMapLoaded"
           @map-click="handleMapClick"
@@ -125,7 +123,7 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #4369b2;
+  background-color: #e63946;
   color: white;
   padding: 0.5rem 1rem;
   height: 60px;
@@ -136,29 +134,52 @@ onMounted(async () => {
 .map-header h1 {
   margin: 0;
   font-size: 1.5rem;
-  color: white;
-  background-color: #8B4513;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
 }
 
-.nav-links {
-  display: flex;
-}
-
-.nav-link {
+.home-link {
   color: white;
   text-decoration: none;
   font-weight: bold;
   padding: 0.5rem 1rem;
-  background-color: #4369b2;
   border-radius: 4px;
   transition: background-color 0.3s;
   margin-left: 0.5rem;
 }
 
-.nav-link:hover {
+.home-link:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.stats-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-left: 0.5rem;
+}
+
+.stats-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.culture-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-left: 0.5rem;
+}
+
+.culture-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-links {
+  display: flex;
 }
 
 .map-content {
@@ -167,7 +188,6 @@ onMounted(async () => {
   overflow: hidden;
   position: relative;
   height: calc(100vh - 60px);
-  background-color: #FFFFE0;
 }
 
 .filter-panel-container {
@@ -177,8 +197,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   z-index: 5;
-  background-color: #8B4513;
-  color: white;
 }
 
 .filter-placeholder {

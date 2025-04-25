@@ -1,20 +1,31 @@
 <template>
   <div class="filter-panel">
-    <div class="panel-section">
-      <div class="section-title">区</div>
-      <div class="section-content">
+    <div class="search-container">
+      <input
+        type="text"
+        v-model="searchQuery"
+        placeholder="搜索餐厅名称..."
+        class="search-input"
+        @input="debounceSearch"
+      />
+      <button class="search-btn" @click="applySearch">
+        <span>🔍</span>
+      </button>
+    </div>
+    
+    <div class="filter-container">
+      <div class="filter-group">
+        <h4>区域筛选</h4>
         <select v-model="selectedDistrict" class="filter-select" @change="applyFilters">
-          <option value="">以下区域 为所有美食店铺</option>
+          <option value="">所有区域</option>
           <option v-for="district in districtList" :key="district" :value="district">
             {{ district }}
           </option>
         </select>
       </div>
-    </div>
-    
-    <div class="panel-section">
-      <div class="section-title">美食类型</div>
-      <div class="section-content">
+      
+      <div class="filter-group">
+        <h4>美食类型</h4>
         <select v-model="selectedFoodType" class="filter-select" @change="applyFilters">
           <option value="">所有类型</option>
           <option v-for="foodType in foodTypeList" :key="foodType" :value="foodType">
@@ -22,10 +33,6 @@
           </option>
         </select>
       </div>
-    </div>
-
-    <div class="description-section">
-      <p>点击任意店铺，会在地图上缩放到对应店铺，并且在地图上点击该店铺会出现店铺详情</p>
     </div>
     
     <div class="filter-actions">
@@ -112,57 +119,71 @@ watch(() => restaurantStore.filters, (newFilters) => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: #8B4513;
-  color: white;
-  height: 100%;
 }
 
-.panel-section {
+.search-container {
+  display: flex;
+  width: 100%;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 0.9rem;
+}
+
+.search-btn {
+  padding: 0.5rem 0.75rem;
+  background-color: #e63946;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-btn:hover {
+  background-color: #d62839;
+}
+
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.section-title {
-  background-color: #4369b2;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-.section-content {
-  padding: 0.5rem;
+.filter-group h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 .filter-select {
-  width: 100%;
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: white;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.description-section {
-  margin-top: 1rem;
-  padding: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
   font-size: 0.9rem;
 }
 
 .filter-actions {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   margin-top: 0.5rem;
 }
 
 .reset-btn {
   padding: 0.5rem 1rem;
-  background-color: #4369b2;
-  color: white;
-  border: none;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -170,6 +191,6 @@ watch(() => restaurantStore.filters, (newFilters) => {
 }
 
 .reset-btn:hover {
-  background-color: #365b99;
+  background-color: #e9ecef;
 }
 </style> 

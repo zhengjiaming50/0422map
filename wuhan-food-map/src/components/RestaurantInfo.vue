@@ -1,12 +1,28 @@
 <template>
-  <div class="restaurant-info-popup">
-    <div class="popup-header">
-      <h3>店铺详情弹出窗口: 内容如下:</h3>
+  <div class="restaurant-info">
+    <div class="info-header">
+      <h3>{{ restaurant.name }}</h3>
+      <button class="close-btn" @click="$emit('close')">&times;</button>
     </div>
     
-    <div class="popup-content">
+    <div v-if="restaurant.image_url" class="info-image">
+      <img :src="restaurant.image_url" :alt="restaurant.name">
+    </div>
+    
+    <div class="info-content">
       <div class="info-item">
-        <div class="item-label">餐厅详情（即点击地图上的餐厅会弹出餐厅的营业时间，电话，特色菜以及用户评价）</div>
+        <div class="item-label">类型:</div>
+        <div class="item-value">{{ restaurant.food_type || '未知' }}</div>
+      </div>
+      
+      <div class="info-item">
+        <div class="item-label">区域:</div>
+        <div class="item-value">{{ restaurant.district || '未知' }}</div>
+      </div>
+      
+      <div class="info-item">
+        <div class="item-label">地址:</div>
+        <div class="item-value">{{ restaurant.address }}</div>
       </div>
       
       <div v-if="restaurant.phone" class="info-item">
@@ -14,27 +30,30 @@
         <div class="item-value">{{ restaurant.phone }}</div>
       </div>
       
-      <div v-if="restaurant.special_dish" class="info-item">
-        <div class="item-label">特色菜:</div>
-        <div class="item-value">{{ restaurant.special_dish || restaurant.description }}</div>
+      <div v-if="restaurant.business_hours" class="info-item">
+        <div class="item-label">营业时间:</div>
+        <div class="item-value">{{ restaurant.business_hours }}</div>
       </div>
-      
-      <!-- 用户评价部分 -->
-      <div class="review-section">
-        <div class="item-label">用户评价:</div>
-        <RestaurantReviews :restaurant-id="restaurant.id" />
-        
-        <div class="rating-button-container">
-          <button class="rating-btn" @click="showRatingForm">我要评价</button>
-        </div>
-      </div>
+    </div>
+    
+    <div v-if="restaurant.description" class="info-description">
+      <h4>餐厅介绍</h4>
+      <p>{{ restaurant.description }}</p>
+    </div>
+    
+    <!-- 用户评价部分 -->
+    <RestaurantReviews :restaurant-id="restaurant.id" />
+    
+    <div class="info-actions">
+      <button class="action-btn" @click="navigateTo">
+        <span>导航到这里</span>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
 import RestaurantReviews from './RestaurantReviews.vue';
-import { ref } from 'vue';
 
 const props = defineProps({
   restaurant: {
@@ -45,15 +64,16 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const showRatingForm = () => {
-  // 实现评价表单逻辑
-  console.log('打开评价表单:', props.restaurant.name);
+const navigateTo = () => {
+  // 以后实现导航功能
+  console.log('导航到:', props.restaurant.name);
+  // 可以使用百度地图、高德地图等第三方导航服务
 };
 </script>
 
 <style scoped>
-.restaurant-info-popup {
-  background-color: #4369b2;
+.restaurant-info {
+  background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 320px;
@@ -62,65 +82,105 @@ const showRatingForm = () => {
   display: flex;
   flex-direction: column;
   position: relative;
-  color: white;
 }
 
-.popup-header {
+.info-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid #eee;
+  background-color: #1d3557;
+  color: white;
+  border-radius: 8px 8px 0 0;
 }
 
-.popup-header h3 {
+.info-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  text-align: center;
 }
 
-.popup-content {
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.info-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.info-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info-content {
   padding: 15px;
 }
 
 .info-item {
-  margin-bottom: 15px;
+  display: flex;
+  margin-bottom: 10px;
 }
 
 .item-label {
   font-weight: 600;
-  margin-bottom: 5px;
+  color: #555;
+  width: 80px;
+  flex-shrink: 0;
 }
 
 .item-value {
-  color: #eee;
+  color: #333;
+  flex-grow: 1;
 }
 
-.review-section {
+.info-description {
+  padding: 0 15px 15px;
+  border-top: 1px solid #eee;
+}
+
+.info-description h4 {
   margin-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 15px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #333;
 }
 
-.rating-button-container {
+.info-description p {
+  margin: 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.info-actions {
+  padding: 15px;
   display: flex;
   justify-content: center;
-  margin-top: 15px;
+  border-top: 1px solid #eee;
 }
 
-.rating-btn {
-  background-color: #8B4513;
+.action-btn {
+  background-color: #e63946;
   color: white;
   border: none;
-  padding: 10px 25px;
+  padding: 10px 15px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
   transition: background-color 0.2s;
 }
 
-.rating-btn:hover {
-  background-color: #704214;
+.action-btn:hover {
+  background-color: #c1121f;
 }
 </style> 
