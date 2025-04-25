@@ -34,6 +34,9 @@
               <span>{{ restaurant.food_type || '未分类' }}</span>
               <span>{{ restaurant.district || '未知区域' }}</span>
             </div>
+            <div class="restaurant-actions">
+              <router-link :to="`/restaurant/${restaurant.id}`" class="view-detail-link">查看详情</router-link>
+            </div>
           </div>
         </div>
       </div>
@@ -251,8 +254,25 @@ onMounted(async () => {
   color: #666;
 }
 
-.restaurant-meta span {
+.restaurant-meta span:nth-child(1) {
   margin-right: 0.5rem;
+}
+
+.restaurant-actions {
+  margin-top: 0.5rem;
+}
+
+.view-detail-link {
+  color: #e63946;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.view-detail-link:hover {
+  background-color: rgba(230, 57, 70, 0.1);
 }
 
 .loading-indicator, .error-message {

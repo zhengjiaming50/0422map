@@ -33,6 +33,13 @@ const routes = [
     name: 'food-route',
     // 懒加载美食路线视图
     component: () => import('../views/FoodRouteView.vue')
+  },
+  {
+    path: '/restaurant/:id',
+    name: 'restaurant-detail',
+    // 懒加载餐厅详情视图
+    component: () => import('../views/RestaurantDetailView.vue'),
+    props: true
   }
 ]
 
