@@ -2,7 +2,7 @@
 <template>
   <div class="stats-view">
     <div class="header">
-      <h1>武汉美食统计</h1>
+      <h1>成都美食统计</h1>
       <div class="nav-links">
         <router-link to="/" class="nav-link">首页</router-link>
         <router-link to="/map" class="nav-link">地图</router-link>
@@ -13,7 +13,7 @@
       <div class="chart-card">
         <h2>各区域美食类型分布</h2>
         <div class="chart-description">
-          <p>此图表展示了武汉各区域不同美食类型的餐厅数量分布。您可以通过下拉菜单选择特定美食类型查看其在各区域的分布情况。</p>
+          <p>此图表展示了成都各区域不同美食类型的餐厅数量分布。您可以通过下拉菜单选择特定美食类型查看其在各区域的分布情况。</p>
         </div>
         <StatsChart
           title="各区域美食类型分布统计"

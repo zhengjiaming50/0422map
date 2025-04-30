@@ -34,48 +34,87 @@ def create_database(db_info):
     env = os.environ.copy()
     env['PGPASSWORD'] = db_info['password']
     
-    # 检查数据库是否已存在
-    check_cmd = [
-        'psql',
-        '-U', db_info['username'],
-        '-h', db_info['host'],
-        '-p', db_info['port'],
-        '-c', f"SELECT 1 FROM pg_database WHERE datname = '{db_info['dbname']}';"
-    ]
-    
+    # 先检查数据库是否存在 (使用更可靠的方法)
     try:
-        result = subprocess.run(check_cmd, capture_output=True, text=True, env=env)
-        db_exists = '1 row' in result.stdout
+        # 尝试连接到数据库，如果连接成功，则数据库存在
+        connect_cmd = [
+            'psql',
+            '-U', db_info['username'],
+            '-h', db_info['host'],
+            '-p', db_info['port'],
+            '-d', db_info['dbname'],
+            '-c', "SELECT 1;"
+        ]
         
-        if db_exists:
+        result = subprocess.run(connect_cmd, capture_output=True, text=True, env=env)
+        
+        # 如果能连接成功，返回码应该是0
+        if result.returncode == 0:
             print(f"数据库 '{db_info['dbname']}' 已存在")
-        else:
-            # 创建数据库
-            create_cmd = [
-                'psql',
-                '-U', db_info['username'],
-                '-h', db_info['host'],
-                '-p', db_info['port'],
-                '-c', f"CREATE DATABASE {db_info['dbname']};"
-            ]
-            subprocess.run(create_cmd, check=True, env=env)
-            print(f"✅ 数据库 '{db_info['dbname']}' 创建成功")
             
-            # 启用PostGIS扩展
-            enable_postgis_cmd = [
+            # 检查PostGIS扩展是否已启用
+            check_postgis_cmd = [
                 'psql',
                 '-U', db_info['username'],
                 '-h', db_info['host'],
                 '-p', db_info['port'],
                 '-d', db_info['dbname'],
-                '-c', "CREATE EXTENSION IF NOT EXISTS postgis;"
+                '-c', "SELECT extname FROM pg_extension WHERE extname = 'postgis';"
             ]
-            subprocess.run(enable_postgis_cmd, check=True, env=env)
-            print(f"✅ PostGIS扩展在数据库 '{db_info['dbname']}' 中启用成功")
+            
+            postgis_result = subprocess.run(check_postgis_cmd, capture_output=True, text=True, env=env)
+            
+            if "postgis" in postgis_result.stdout:
+                print(f"PostGIS扩展已在数据库 '{db_info['dbname']}' 中启用")
+            else:
+                # 启用PostGIS扩展
+                enable_postgis_cmd = [
+                    'psql',
+                    '-U', db_info['username'],
+                    '-h', db_info['host'],
+                    '-p', db_info['port'],
+                    '-d', db_info['dbname'],
+                    '-c', "CREATE EXTENSION IF NOT EXISTS postgis;"
+                ]
+                subprocess.run(enable_postgis_cmd, check=True, env=env)
+                print(f"✅ PostGIS扩展在数据库 '{db_info['dbname']}' 中启用成功")
+                
+            return True
+    except Exception:
+        # 如果连接失败，数据库可能不存在，继续创建
+        pass
+    
+    # 创建数据库
+    try:
+        create_cmd = [
+            'psql',
+            '-U', db_info['username'],
+            '-h', db_info['host'],
+            '-p', db_info['port'],
+            '-c', f"CREATE DATABASE {db_info['dbname']};"
+        ]
+        subprocess.run(create_cmd, check=True, env=env)
+        print(f"✅ 数据库 '{db_info['dbname']}' 创建成功")
+        
+        # 启用PostGIS扩展
+        enable_postgis_cmd = [
+            'psql',
+            '-U', db_info['username'],
+            '-h', db_info['host'],
+            '-p', db_info['port'],
+            '-d', db_info['dbname'],
+            '-c', "CREATE EXTENSION IF NOT EXISTS postgis;"
+        ]
+        subprocess.run(enable_postgis_cmd, check=True, env=env)
+        print(f"✅ PostGIS扩展在数据库 '{db_info['dbname']}' 中启用成功")
     
     except subprocess.CalledProcessError as e:
-        print(f"❌ 数据库操作失败: {e}")
-        return False
+        if "already exists" in str(e):
+            print(f"数据库 '{db_info['dbname']}' 已存在，跳过创建步骤")
+            return True
+        else:
+            print(f"❌ 数据库操作失败: {e}")
+            return False
     except Exception as e:
         print(f"❌ 发生错误: {e}")
         return False
@@ -150,4 +189,4 @@ Linux (Ubuntu/Debian)安装步骤:
         """)
 
 if __name__ == '__main__':
-    setup_databases() 
+    setup_databases()

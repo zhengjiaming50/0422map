@@ -1,14 +1,14 @@
 <template>
   <div class="home">
     <header class="home-header">
-      <h1>武汉美食地图</h1>
-      <p class="subtitle">探索武汉特色美食，发现城市美食文化</p>
+      <h1>成都美食地图</h1>
+      <p class="subtitle">探索成都特色美食，发现城市美食文化</p>
     </header>
     
     <main class="home-content">
       <div class="intro-card">
-        <h2>欢迎使用武汉美食地图系统</h2>
-        <p>这里汇集了武汉各区域的特色餐厅和美食，点击下方按钮开始你的美食探索之旅。</p>
+        <h2>欢迎使用成都美食地图系统</h2>
+        <p>这里汇集了成都各区域的特色餐厅和美食，点击下方按钮开始你的美食探索之旅。</p>
         <div class="actions">
           <router-link to="/map" class="map-btn">进入地图</router-link>
           <router-link to="/stats" class="stats-btn">查看统计</router-link>

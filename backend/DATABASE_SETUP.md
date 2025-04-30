@@ -8,7 +8,7 @@
 - PostGIS 3.0+
 - Python 3.8+
 
-## 安装PostgreSQL和PostGIS
+## 安装PostgreSQL和PostGIS（stack）
 
 ### Windows
 

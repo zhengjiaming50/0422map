@@ -13,7 +13,7 @@ class Config:
     # 数据库配置
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL', 
-        'postgresql://postgres:postgres@localhost:5432/wuhan_food_map'
+        'postgresql://postgres:1@localhost:5432/wuhan_food_map'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
@@ -29,7 +29,7 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'TEST_DATABASE_URL', 
-        'postgresql://postgres:postgres@localhost:5432/wuhan_food_map_test'
+        'postgresql://postgres:1@localhost:5432/wuhan_food_map_test'
     )
     
 class ProductionConfig(Config):

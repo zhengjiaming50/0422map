@@ -1,7 +1,7 @@
 <template>
   <div class="map-view">
     <header class="map-header">
-      <h1>武汉美食地图</h1>
+      <h1>成都美食地图</h1>
       <div class="nav-links">
         <router-link to="/" class="home-link">返回首页</router-link>
         <router-link to="/stats" class="stats-link">查看统计</router-link>
@@ -43,7 +43,7 @@
       
       <div class="map-wrapper">
         <MapContainer 
-          :initial-center="[114.3008, 30.5433]" 
+          :initial-center="[104.0668, 30.5728]" 
           :initial-zoom="12"
           @map-loaded="handleMapLoaded"
           @map-click="handleMapClick"

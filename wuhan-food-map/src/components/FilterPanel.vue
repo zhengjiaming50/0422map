@@ -129,9 +129,14 @@ watch(() => restaurantStore.filters, (newFilters) => {
 .search-input {
   flex: 1;
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid #aaa;
   border-radius: 4px 0 0 4px;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
+  color: #222;
+}
+
+.search-input::placeholder {
+  color: #666;
 }
 
 .search-btn {
@@ -142,6 +147,7 @@ watch(() => restaurantStore.filters, (newFilters) => {
   border-radius: 0 4px 4px 0;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-size: 1.1rem;
 }
 
 .search-btn:hover {
@@ -162,16 +168,18 @@ watch(() => restaurantStore.filters, (newFilters) => {
 
 .filter-group h4 {
   margin: 0;
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
 }
 
 .filter-select {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid #aaa;
   border-radius: 4px;
   background-color: white;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
+  color: #222;
 }
 
 .filter-actions {
@@ -183,14 +191,17 @@ watch(() => restaurantStore.filters, (newFilters) => {
 .reset-btn {
   padding: 0.5rem 1rem;
   background-color: #f8f9fa;
-  border: 1px solid #ddd;
+  color: #333;
+  border: 1px solid #aaa;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 500;
   transition: all 0.2s;
 }
 
 .reset-btn:hover {
   background-color: #e9ecef;
+  color: #111;
 }
 </style> 
